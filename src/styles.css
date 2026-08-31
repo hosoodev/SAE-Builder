@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply m-0 bg-white text-slate-900;
+  }
+
+  main {
+    @apply mx-auto max-w-4xl px-5 py-10;
+  }
+
+  header,
+  footer {
+    @apply border-slate-200 px-5 py-4;
+  }
+
+  header {
+    @apply border-b;
+  }
+
+  footer {
+    @apply border-t;
+  }
+
+  nav {
+    @apply mx-auto flex max-w-4xl gap-5;
+  }
+
+  h1 {
+    @apply mb-6 text-4xl font-semibold tracking-tight;
+  }
+
+  h2 {
+    @apply mt-10 mb-3 text-2xl font-semibold;
+  }
+
+  p {
+    @apply mb-4 leading-7;
+  }
+
+  a {
+    @apply text-blue-700 underline-offset-4 hover:underline;
+  }
+}
