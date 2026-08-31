@@ -1,5 +1,4 @@
 node_modules/
-dist/
 .builder-cache/
 .demo-builder-cache/
 demo-dist/

@@ -1,6 +1,6 @@
 {
   "name": "@hosoodev/sae-builder",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "HTML-first SEO/AEO static site builder",
   "packageManager": "pnpm@10.34.5",
@@ -37,7 +37,6 @@
     "check": "tsc -p tsconfig.json --noEmit && tsx --test tests/**/*.test.ts",
     "test": "tsx --test tests/**/*.test.ts",
     "clean": "node -e \"import('node:fs/promises').then(({rm}) => Promise.all(['dist','.builder-cache'].map((p) => rm(p,{recursive:true,force:true}))))\"",
-    "prepare": "npm run build",
     "prepack": "npm run build"
   },
   "dependencies": {

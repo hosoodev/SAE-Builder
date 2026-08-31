@@ -1,0 +1,2 @@
+export { assertInsideRoot, assertPathInsideRoot, assertSafeRelativePath, isInsideRoot, isPathInsideRoot, relativeInsideRoot, resolveInsideRoot, toPosixPath, } from "./paths.js";
+//# sourceMappingURL=path.d.ts.map
