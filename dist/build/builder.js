@@ -15,7 +15,7 @@ import { CACHE_VERSION, loadBuildCache, saveBuildCache, } from "./cache.js";
 import { DependencyGraph } from "./graph.js";
 import { minifyHtmlDocument } from "./html.js";
 import { planInvalidation, syncOutputTree, } from "./incremental.js";
-export const BUILDER_VERSION = "0.3.4";
+export const BUILDER_VERSION = "0.3.5";
 let stageSequence = 0;
 function compareText(left, right) {
     return left < right ? -1 : left > right ? 1 : 0;
