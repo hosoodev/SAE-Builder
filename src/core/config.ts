@@ -123,6 +123,11 @@ const configSchema = z.object({
     format: z.enum(["png", "webp"]).default("png"),
     quality: z.number().int().min(1).max(100).default(90),
     fontFamily: z.string().trim().min(1).optional(),
+    fonts: z.array(z.object({
+      file: z.string().trim().min(1),
+      weight: z.number().int().min(1).max(1000).default(400),
+      style: z.enum(["normal", "italic"]).default("normal"),
+    }).strict()).max(8).default([]),
     templates: z.record(z.string(), z.string().min(1)).default({}),
   }).strict().default({
     enabled: false,
@@ -130,6 +135,7 @@ const configSchema = z.object({
     height: 630,
     format: "png",
     quality: 90,
+    fonts: [],
     templates: {},
   }),
   seo: z.object({
@@ -228,6 +234,9 @@ export function resolveConfig(
   }
   for (const [name, value] of Object.entries(parsed.data.og.templates)) {
     assertRelativeProjectPath(`og.templates.${name}`, value);
+  }
+  for (const [index, font] of parsed.data.og.fonts.entries()) {
+    assertRelativeProjectPath(`og.fonts.${index}.file`, font.file);
   }
 
   const explicitSiteDefault = input.site.defaultLocale;

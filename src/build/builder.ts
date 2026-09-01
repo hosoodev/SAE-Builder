@@ -15,6 +15,7 @@ import {
   writeAssetManifest,
   type AssetBuildPlan,
   type AssetManifest,
+  type EmbeddedOgFont,
   type PlannedOgImage,
 } from "../assets/index.js";
 import {
@@ -41,6 +42,7 @@ import {
   discoverFiles,
   isInsideRoot,
   relativeInsideRoot,
+  resolveFileInsideRoot,
   readTextFile,
 } from "../filesystem/index.js";
 import {
@@ -95,7 +97,7 @@ import {
   type OutputSyncResult,
 } from "./incremental.js";
 
-export const BUILDER_VERSION = "0.2.0";
+export const BUILDER_VERSION = "0.3.2";
 
 export interface BuildOptions {
   root?: string;
@@ -847,6 +849,37 @@ async function planPageOgArtifacts(
   if (!config.og.enabled) return [];
   const artifacts: PageOgArtifact[] = [];
   const loadedTemplates = new Map<string, string>();
+  let loadedFonts: Promise<readonly EmbeddedOgFont[]> | undefined;
+  const loadOgFonts = (): Promise<readonly EmbeddedOgFont[]> => {
+    loadedFonts ??= Promise.all(config.og.fonts.map(async (font) => {
+      const source = await resolveFileInsideRoot(
+        config.resolvedPaths.templates,
+        font.file,
+        "OG font file",
+      );
+      const extension = path.extname(source).toLowerCase();
+      const formats: Record<string, Pick<EmbeddedOgFont, "mimeType" | "format">> = {
+        ".ttf": { mimeType: "font/ttf", format: "truetype" },
+        ".otf": { mimeType: "font/otf", format: "opentype" },
+        ".woff": { mimeType: "font/woff", format: "woff" },
+        ".woff2": { mimeType: "font/woff2", format: "woff2" },
+      };
+      const format = formats[extension];
+      if (format === undefined) {
+        throw new BuilderError(
+          "BUILD_FAILED",
+          `Unsupported OG font format '${extension || "(none)"}' for ${font.file}.`,
+        );
+      }
+      return Object.freeze({
+        ...format,
+        contents: new Uint8Array(await readFile(source)),
+        weight: font.weight,
+        style: font.style,
+      });
+    }));
+    return loadedFonts;
+  };
   const loadOgTemplate = async (entry: string): Promise<string> => {
     const cached = loadedTemplates.get(entry);
     if (cached !== undefined) return cached;
@@ -880,6 +913,7 @@ async function planPageOgArtifacts(
       format: config.og.format,
       quality: config.og.quality,
       fontFamily: config.og.fontFamily,
+      fonts: await loadOgFonts(),
       template,
       filenameStem: ogFilenameStem(entry),
       publicPath: "/assets/og",

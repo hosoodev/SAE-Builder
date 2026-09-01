@@ -126,6 +126,27 @@ test("OG SVG data is XML escaped and raster hashes are deterministic", async (t)
   assert.equal(generatedFiles.some(file => /\.(?:ttf|otf|woff2?)$/i.test(file)), false);
 });
 
+test("OG SVG embeds configured fonts and provides wrapped text placeholders", () => {
+  const template = `<svg xmlns="http://www.w3.org/2000/svg"><text font-family="{{fontFamily}}">{{titleLine1}}</text><text>{{titleLine2}}</text><text>{{subtitleLine1}}</text><text>{{subtitleLine2}}</text></svg>`;
+  const svg = renderOgSvg({
+    title: "한글 제목이 길어져도 두 줄 영역 안에서 읽을 수 있어야 하는 제목",
+    subtitle: "A subtitle that is deliberately long enough to use more than one line in the social image.",
+  }, {
+    template,
+    fontFamily: "sans-serif",
+    fonts: [{
+      contents: new Uint8Array([0, 1, 2, 3]),
+      mimeType: "font/ttf",
+      format: "truetype",
+      weight: 700,
+    }],
+  });
+  assert.match(svg, /@font-face\{font-family:'SaeOgEmbedded'/u);
+  assert.match(svg, /data:font\/ttf;base64,AAECAw==/u);
+  assert.match(svg, /font-family="&apos;SaeOgEmbedded&apos;, sans-serif"/u);
+  assert.doesNotMatch(svg, /\{\{/u);
+});
+
 test("OG templates reject external resources", () => {
   assert.throws(
     () => renderOgSvg({ title: "Unsafe" }, {

@@ -2,7 +2,7 @@ import { type AssetManifest } from "../assets/index.js";
 import { type Logger, type ResolvedBuilderConfig } from "../core/index.js";
 import { type ContentRepository } from "../content/index.js";
 import { type SeoDiagnostic } from "../seo/index.js";
-export declare const BUILDER_VERSION = "0.2.0";
+export declare const BUILDER_VERSION = "0.3.2";
 export interface BuildOptions {
     root?: string;
     configFile?: string;

@@ -18,7 +18,16 @@ export interface RenderOgSvgOptions {
   readonly width?: number;
   readonly height?: number;
   readonly fontFamily?: string;
+  readonly fonts?: readonly EmbeddedOgFont[];
   readonly template: string;
+}
+
+export interface EmbeddedOgFont {
+  readonly contents: Uint8Array;
+  readonly mimeType: "font/ttf" | "font/otf" | "font/woff" | "font/woff2";
+  readonly format: "truetype" | "opentype" | "woff" | "woff2";
+  readonly weight?: number;
+  readonly style?: "normal" | "italic";
 }
 
 export interface GenerateOgImageOptions extends RenderOgSvgOptions {
@@ -74,12 +83,41 @@ export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): 
   const height = dimension(options.height ?? 630, "OG height");
   const template = options.template;
   assertSelfContainedSvg(template, "OG template");
+  const wrap = (value: string, maximum: number, count: number): string[] => {
+    let remaining = value.replace(/\s+/gu, " ").trim();
+    const lines: string[] = [];
+    while (remaining && lines.length < count) {
+      const characters = [...remaining];
+      if (characters.length <= maximum || lines.length === count - 1) {
+        lines.push(remaining);
+        break;
+      }
+      const candidate = characters.slice(0, maximum + 1).join("");
+      const space = candidate.lastIndexOf(" ");
+      const split = space >= Math.floor(maximum * 0.55)
+        ? [...candidate.slice(0, space)].length
+        : maximum;
+      lines.push(characters.slice(0, split).join("").trim());
+      remaining = characters.slice(split).join("").trim();
+    }
+    return Array.from({ length: count }, (_, index) => lines[index] ?? "");
+  };
+  const titleLines = wrap(data.title, 24, 2);
+  const subtitleLines = wrap(data.subtitle ?? "", 42, 3);
+  const embeddedFamily = "SaeOgEmbedded";
   const values: Record<string, string> = {
     width: String(width),
     height: String(height),
-    fontFamily: options.fontFamily ?? "Arial, sans-serif",
+    fontFamily: options.fonts?.length
+      ? `'${embeddedFamily}', ${options.fontFamily ?? "sans-serif"}`
+      : options.fontFamily ?? "Arial, sans-serif",
     title: data.title,
+    titleLine1: titleLines[0] ?? "",
+    titleLine2: titleLines[1] ?? "",
     subtitle: data.subtitle ?? "",
+    subtitleLine1: subtitleLines[0] ?? "",
+    subtitleLine2: subtitleLines[1] ?? "",
+    subtitleLine3: subtitleLines[2] ?? "",
     category: data.category ?? "",
     siteName: data.siteName ?? "",
   };
@@ -88,7 +126,19 @@ export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): 
     return escapeXml(values[key] ?? "");
   });
   if (/\{\{[^}]+\}\}/.test(rendered)) throw new Error("OG template contains an unresolved placeholder.");
-  return rendered;
+  const fontFaces = (options.fonts ?? []).map((font) => {
+    const weight = font.weight ?? 400;
+    if (!Number.isInteger(weight) || weight < 1 || weight > 1000) {
+      throw new RangeError("OG font weight must be an integer between 1 and 1000.");
+    }
+    const base64 = Buffer.from(font.contents).toString("base64");
+    return `@font-face{font-family:'${embeddedFamily}';src:url(data:${font.mimeType};base64,${base64}) format('${font.format}');font-weight:${weight};font-style:${font.style ?? "normal"};}`;
+  }).join("");
+  const withFonts = fontFaces
+    ? rendered.replace(/(<svg\b[^>]*>)/u, `$1<style>${fontFaces}</style>`)
+    : rendered;
+  assertSelfContainedSvg(withFonts, "rendered OG template");
+  return withFonts;
 }
 
 function safeStem(value: string): string {

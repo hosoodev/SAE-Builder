@@ -3,7 +3,7 @@ import { mkdir, readFile, rm, writeFile, } from "node:fs/promises";
 import { hashContent, planCssEntries, planOgImage, planScriptEntries, stableStringify, writeAssetManifest, } from "../assets/index.js";
 import { BuilderError, createBuildContext, loadConfig, resolveConfig, serializePublicUrl, } from "../core/index.js";
 import { createContentRepository, loadContent, } from "../content/index.js";
-import { assertInsideRoot, assertNoSymlinkPath, copyDirectory, discoverFiles, isInsideRoot, relativeInsideRoot, readTextFile, } from "../filesystem/index.js";
+import { assertInsideRoot, assertNoSymlinkPath, copyDirectory, discoverFiles, isInsideRoot, relativeInsideRoot, resolveFileInsideRoot, readTextFile, } from "../filesystem/index.js";
 import { createTranslationAlternates, localizeRoute, renderHreflangTags, } from "../i18n/index.js";
 import { buildMetadata, createArticleSchema, createBreadcrumbListSchema, createJsonLdGraph, createFaqPageSchema, createOrganizationSchema, createWebApplicationSchema, createWebPageSchema, createWebSiteSchema, daumWebmasterComment, diagnoseSeoSite, generateGoogleAdsTxt, generateRobotsTxt, generateRss, planLocalizedSitemaps, renderJsonLd, renderIntegrationHead, renderMetadataTags, resolveSiteUrl, } from "../seo/index.js";
 import { FileTemplateLoader } from "../template/index.js";
@@ -14,7 +14,7 @@ import { CACHE_VERSION, loadBuildCache, saveBuildCache, } from "./cache.js";
 import { DependencyGraph } from "./graph.js";
 import { minifyHtmlDocument } from "./html.js";
 import { planInvalidation, syncOutputTree, } from "./incremental.js";
-export const BUILDER_VERSION = "0.2.0";
+export const BUILDER_VERSION = "0.3.2";
 let stageSequence = 0;
 function compareText(left, right) {
     return left < right ? -1 : left > right ? 1 : 0;
@@ -564,6 +564,30 @@ async function planPageOgArtifacts(config, entries, useCache) {
         return [];
     const artifacts = [];
     const loadedTemplates = new Map();
+    let loadedFonts;
+    const loadOgFonts = () => {
+        loadedFonts ??= Promise.all(config.og.fonts.map(async (font) => {
+            const source = await resolveFileInsideRoot(config.resolvedPaths.templates, font.file, "OG font file");
+            const extension = path.extname(source).toLowerCase();
+            const formats = {
+                ".ttf": { mimeType: "font/ttf", format: "truetype" },
+                ".otf": { mimeType: "font/otf", format: "opentype" },
+                ".woff": { mimeType: "font/woff", format: "woff" },
+                ".woff2": { mimeType: "font/woff2", format: "woff2" },
+            };
+            const format = formats[extension];
+            if (format === undefined) {
+                throw new BuilderError("BUILD_FAILED", `Unsupported OG font format '${extension || "(none)"}' for ${font.file}.`);
+            }
+            return Object.freeze({
+                ...format,
+                contents: new Uint8Array(await readFile(source)),
+                weight: font.weight,
+                style: font.style,
+            });
+        }));
+        return loadedFonts;
+    };
     const loadOgTemplate = async (entry) => {
         const cached = loadedTemplates.get(entry);
         if (cached !== undefined)
@@ -597,6 +621,7 @@ async function planPageOgArtifacts(config, entries, useCache) {
             format: config.og.format,
             quality: config.og.quality,
             fontFamily: config.og.fontFamily,
+            fonts: await loadOgFonts(),
             template,
             filenameStem: ogFilenameStem(entry),
             publicPath: "/assets/og",

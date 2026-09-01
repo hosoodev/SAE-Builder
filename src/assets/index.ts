@@ -17,6 +17,7 @@ export {
   renderOgSvg,
 } from "./og.js";
 export type {
+  EmbeddedOgFont,
   GeneratedOgImage,
   GenerateOgImageOptions,
   OgTemplateData,

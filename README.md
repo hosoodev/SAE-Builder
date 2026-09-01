@@ -8,7 +8,7 @@ HTML-first SEO/AEO 정적 사이트 빌더이며 `@hosoodev/sae-builder` 패키�
 현재 공개 GitHub 릴리스에서 설치할 수 있습니다.
 
 ```bash
-pnpm add -D github:hosoodev/SAE-Builder#v0.3.1
+pnpm add -D github:hosoodev/SAE-Builder#v0.3.2
 ```
 
 설치 후 사이트의 `package.json`에서 다음 명령을 연결합니다.
@@ -141,6 +141,26 @@ OG 디자인은 Builder에 내장하지 않습니다. 자동 생성을 사용하
 지정합니다. 사용할 템플릿이 없으면 해당 페이지의 OG 이미지만 생성하지 않고 빌드는
 계속됩니다. Builder는 사이트 템플릿의 안전성 검사·변수 치환·래스터 변환·해싱만
 담당합니다.
+
+한글처럼 빌드 환경의 기본 폰트에 의존할 수 없는 문자는 사이트가 소유한 폰트를
+템플릿 디렉터리 아래에 두고 함께 지정합니다. Builder는 폰트를 SVG 데이터 URI로
+포함하므로 로컬·CI·Docker에서 같은 글리프를 렌더링합니다.
+
+```js
+og: {
+  enabled: true,
+  fontFamily: "'Nanum Gothic', sans-serif",
+  fonts: [
+    { file: "og/fonts/NanumGothic-Regular.ttf", weight: 400 },
+    { file: "og/fonts/NanumGothic-Bold.ttf", weight: 700 }
+  ],
+  templates: { default: "og/default.svg" }
+}
+```
+
+SVG 템플릿은 원문 `title`, `subtitle` 외에도 `titleLine1`,
+`titleLine2`, `subtitleLine1`부터 `subtitleLine3`까지 사용할 수 있습니다.
+줄 단위 placeholder를 `tspan`에 배치하면 긴 문구가 이미지 밖으로 넘치지 않습니다.
 플러그인 산출물도 Core/public/SEO/OG 산출물과 같은 소유권 검사를 거칩니다.
 
 `BuildResult.incremental`은 `renderedPages`, `reusedPages`, invalidated output과

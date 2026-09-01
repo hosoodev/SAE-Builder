@@ -8,7 +8,15 @@ export interface RenderOgSvgOptions {
     readonly width?: number;
     readonly height?: number;
     readonly fontFamily?: string;
+    readonly fonts?: readonly EmbeddedOgFont[];
     readonly template: string;
+}
+export interface EmbeddedOgFont {
+    readonly contents: Uint8Array;
+    readonly mimeType: "font/ttf" | "font/otf" | "font/woff" | "font/woff2";
+    readonly format: "truetype" | "opentype" | "woff" | "woff2";
+    readonly weight?: number;
+    readonly style?: "normal" | "italic";
 }
 export interface GenerateOgImageOptions extends RenderOgSvgOptions {
     readonly outputDirectory: string;

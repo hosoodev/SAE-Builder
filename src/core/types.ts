@@ -88,6 +88,11 @@ export interface OgConfig {
   format: "png" | "webp";
   quality: number;
   fontFamily?: string;
+  fonts: Array<{
+    file: string;
+    weight: number;
+    style: "normal" | "italic";
+  }>;
   templates: Record<string, string>;
 }
 
