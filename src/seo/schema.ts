@@ -1,3 +1,5 @@
+import { serializePublicUrl } from "../core/url.js";
+
 export type JsonLdPrimitive = string | number | boolean | null;
 export type JsonLdValue = JsonLdPrimitive | JsonLdObject | readonly JsonLdValue[];
 export interface JsonLdObject {
@@ -251,4 +253,3 @@ export function serializeJsonLd(value: JsonLdValue): string {
 export function renderJsonLd(value: JsonLdValue): string {
   return `<script type="application/ld+json">${serializeJsonLd(value)}</script>`;
 }
-import { serializePublicUrl } from "../core/url.js";

@@ -123,3 +123,28 @@ test("robots groups and sitemap declarations have stable ordering", () => {
     /Sitemap: https:\/\/example\.test\/sitemap\.xml\n\n#DaumWebMasterTool:hash:signed==\n$/u,
   );
 });
+
+test("public discovery files preserve readable internationalized hostnames", () => {
+  const siteUrl = "https://영문주소변환.kr/";
+  assert.match(
+    generateSitemap([{ route: "/guides" }], { siteUrl }),
+    /<loc>https:\/\/영문주소변환\.kr\/guides<\/loc>/u,
+  );
+  assert.match(
+    generateRss([{
+      route: "/guides",
+      title: "Guide",
+      description: "Guide description",
+      date: "2026-09-01",
+    }], {
+      siteUrl,
+      title: "Site",
+      description: "Site description",
+    }),
+    /<link>https:\/\/영문주소변환\.kr\/guides<\/link>/u,
+  );
+  assert.match(
+    generateRobotsTxt({ siteUrl }),
+    /Sitemap: https:\/\/영문주소변환\.kr\/sitemap\.xml/u,
+  );
+});

@@ -1,3 +1,4 @@
+import { serializePublicUrl } from "../core/url.js";
 function requireText(value, label) {
     const trimmed = value.trim();
     if (!trimmed) {
@@ -176,5 +177,4 @@ export function serializeJsonLd(value) {
 export function renderJsonLd(value) {
     return `<script type="application/ld+json">${serializeJsonLd(value)}</script>`;
 }
-import { serializePublicUrl } from "../core/url.js";
 //# sourceMappingURL=schema.js.map
