@@ -279,13 +279,13 @@ test("configured automatic OG images are hashed, linked, cached, and check-safe"
   }
 });
 
-test("automatic OG generation requires a site-owned default template", async () => {
+test("automatic OG generation skips pages when no site template is configured", async () => {
   const root = await fixture({ ogEnabled: true, ogTemplate: false });
   try {
-    await assert.rejects(
-      () => build({ root, mode: "production" }),
-      /no site-owned OG template is configured/u,
-    );
+    const result = await build({ root, mode: "production" });
+    assert.equal(Object.keys(result.assets).some((name) => name.startsWith("og:")), false);
+    const home = await readFile(path.join(root, "dist/index.html"), "utf8");
+    assert.doesNotMatch(home, /property="og:image"/u);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

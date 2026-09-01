@@ -583,9 +583,8 @@ async function planPageOgArtifacts(config, entries, useCache) {
         const templateEntry = templateName === undefined
             ? config.og.templates.default
             : config.og.templates[templateName] ?? config.og.templates.default;
-        if (templateEntry === undefined) {
-            throw new BuilderError("BUILD_FAILED", `${entry.sourceRelativePath} needs an automatic OG image, but no site-owned OG template is configured.`);
-        }
+        if (templateEntry === undefined)
+            continue;
         const template = await loadOgTemplate(templateEntry);
         const planned = await planOgImage({
             title: entry.frontmatter.title,
