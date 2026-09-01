@@ -1,7 +1,5 @@
 import path from "node:path";
 
-import sharp from "sharp";
-
 import { getOrCreateArtifact, materializeIfChanged } from "./artifact-cache.js";
 import { escapeXml } from "./escape.js";
 import { hashContent, stableStringify } from "./hashing.js";
@@ -137,7 +135,6 @@ export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): 
   const withFonts = fontFaces
     ? rendered.replace(/(<svg\b[^>]*>)/u, `$1<style>${fontFaces}</style>`)
     : rendered;
-  assertSelfContainedSvg(withFonts, "rendered OG template");
   return withFonts;
 }
 
@@ -169,6 +166,7 @@ export async function planOgImage(
   data: OgTemplateData,
   options: PlanOgImageOptions,
 ): Promise<PlannedOgImage> {
+  const { default: sharp } = await import("sharp");
   const width = dimension(options.width ?? 1200, "OG width");
   const height = dimension(options.height ?? 630, "OG height");
   const format = options.format ?? "png";

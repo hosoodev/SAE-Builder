@@ -1,8 +1,6 @@
 import path from "node:path";
 import { readFile } from "node:fs/promises";
 
-import sharp from "sharp";
-
 import { getOrCreateArtifact, materializeIfChanged } from "./artifact-cache.js";
 import { escapeHtmlAttribute } from "./escape.js";
 import { hashContent, stableStringify } from "./hashing.js";
@@ -94,6 +92,7 @@ export async function optimizeImage(
   sourcePath: string,
   options: OptimizeImageOptions,
 ): Promise<OptimizedImageResult> {
+  const { default: sharp } = await import("sharp");
   const source = await readFile(sourcePath);
   const sourceLooksLikeSvg = path.extname(sourcePath).toLowerCase() === ".svg"
     || /<svg\b/i.test(source.subarray(0, 4096).toString("utf8"));
