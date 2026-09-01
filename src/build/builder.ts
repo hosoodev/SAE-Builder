@@ -1,8 +1,6 @@
 import path from "node:path";
-import os from "node:os";
 import {
   mkdir,
-  mkdtemp,
   readFile,
   rm,
   writeFile,
@@ -966,45 +964,6 @@ async function planPageOgArtifacts(
   return artifacts.sort((left, right) => compareText(left.relativePath, right.relativePath));
 }
 
-async function activateOgFontDiscovery(config: ResolvedBuilderConfig): Promise<() => Promise<void>> {
-  if (!config.og.enabled || config.og.fonts.length === 0) return async () => {};
-
-  const fontFiles = await Promise.all(config.og.fonts.map((font) =>
-    resolveFileInsideRoot(config.resolvedPaths.templates, font.file, "OG font file")));
-  const fontDirectories = [...new Set(fontFiles.map((file) => path.dirname(file)))];
-  const temporary = await mkdtemp(path.join(os.tmpdir(), "sae-og-fontconfig-"));
-  const cacheDirectory = path.join(temporary, "cache");
-  await mkdir(cacheDirectory, { recursive: true });
-  const xmlPath = (value: string): string => value
-    .replaceAll(String.fromCharCode(92), "/")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
-  const fontConfigFile = path.join(temporary, "fonts.conf");
-  await writeFile(fontConfigFile, [
-    '<?xml version="1.0"?>',
-    '<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">',
-    "<fontconfig>",
-    ...fontDirectories.map((directory) => `  <dir>${xmlPath(directory)}</dir>`),
-    `  <cachedir>${xmlPath(cacheDirectory)}</cachedir>`,
-    "</fontconfig>",
-    "",
-  ].join("\n"), "utf8");
-
-  const previousFile = process.env.FONTCONFIG_FILE;
-  const previousPath = process.env.FONTCONFIG_PATH;
-  process.env.FONTCONFIG_FILE = fontConfigFile;
-  process.env.FONTCONFIG_PATH = temporary;
-
-  return async () => {
-    if (previousFile === undefined) delete process.env.FONTCONFIG_FILE;
-    else process.env.FONTCONFIG_FILE = previousFile;
-    if (previousPath === undefined) delete process.env.FONTCONFIG_PATH;
-    else process.env.FONTCONFIG_PATH = previousPath;
-    await rm(temporary, { recursive: true, force: true });
-  };
-}
-
 async function writeAssetPlans(stageRoot: string, plans: readonly AssetBuildPlan[]): Promise<void> {
   const files = plans
     .flatMap((plan) => plan.files)
@@ -1182,8 +1141,6 @@ async function runBuild(options: BuildOptions): Promise<BuildResult> {
       });
     },
   });
-  const restoreFontDiscovery = await activateOgFontDiscovery(config);
-
   try {
     await assertNoSymlinkPath(root, config.resolvedPaths.output, true);
     await assertNoSymlinkPath(root, config.resolvedPaths.cache, true);
@@ -1538,8 +1495,6 @@ async function runBuild(options: BuildOptions): Promise<BuildResult> {
       // Never follow or delete a staging path that was replaced by a link.
     }
     throw error;
-  } finally {
-    await restoreFontDiscovery();
   }
 }
 

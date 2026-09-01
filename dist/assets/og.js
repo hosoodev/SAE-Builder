@@ -1,4 +1,7 @@
 import path from "node:path";
+import os from "node:os";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { Resvg } from "@resvg/resvg-js";
 import { getOrCreateArtifact, materializeIfChanged } from "./artifact-cache.js";
 import { escapeXml } from "./escape.js";
 import { hashContent, stableStringify } from "./hashing.js";
@@ -98,7 +101,7 @@ export async function planOgImage(data, options) {
     const svg = renderOgSvg(data, options);
     const svgHash = hashContent(svg);
     const recipeHash = hashContent(stableStringify({
-        kind: "og-image-v1",
+        kind: "og-image-v2",
         svgHash,
         width,
         height,
@@ -109,15 +112,40 @@ export async function planOgImage(data, options) {
             weight: font.weight ?? 400,
             style: font.style ?? "normal",
         })),
+        renderer: "resvg-js-v1",
         sharp: sharp.versions.sharp,
     }));
     const create = async () => {
-        let pipeline = sharp(Buffer.from(svg), { failOn: "error" }).resize({ width, height, fit: "fill" });
-        pipeline = format === "webp"
-            ? pipeline.webp({ quality, effort: 4 })
-            : pipeline.png({ compressionLevel: 9, adaptiveFiltering: false });
-        const encoded = await pipeline.toBuffer({ resolveWithObject: true });
-        return { contents: encoded.data, width: encoded.info.width, height: encoded.info.height };
+        const temporary = await mkdtemp(path.join(os.tmpdir(), "sae-og-resvg-"));
+        try {
+            const fontFiles = await Promise.all((options.fonts ?? []).map(async (font, index) => {
+                const extension = font.format === "opentype"
+                    ? "otf"
+                    : font.format === "truetype"
+                        ? "ttf"
+                        : font.format;
+                const filePath = path.join(temporary, `font-${index}.${extension}`);
+                await writeFile(filePath, font.contents);
+                return filePath;
+            }));
+            const png = new Resvg(svg, {
+                fitTo: { mode: "width", value: width },
+                font: {
+                    fontFiles,
+                    loadSystemFonts: fontFiles.length === 0,
+                    defaultFontFamily: options.fontFamily,
+                },
+            }).render().asPng();
+            let pipeline = sharp(png, { failOn: "error" }).resize({ width, height, fit: "fill" });
+            pipeline = format === "webp"
+                ? pipeline.webp({ quality, effort: 4 })
+                : pipeline.png({ compressionLevel: 9, adaptiveFiltering: false });
+            const encoded = await pipeline.toBuffer({ resolveWithObject: true });
+            return { contents: encoded.data, width: encoded.info.width, height: encoded.info.height };
+        }
+        finally {
+            await rm(temporary, { recursive: true, force: true });
+        }
     };
     const artifact = options.cacheDirectory
         ? await getOrCreateArtifact(path.join(options.cacheDirectory, "og"), recipeHash, format, create)

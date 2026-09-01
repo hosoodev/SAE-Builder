@@ -143,14 +143,14 @@ OG 디자인은 Builder에 내장하지 않습니다. 자동 생성을 사용하
 담당합니다.
 
 한글처럼 빌드 환경의 기본 폰트에 의존할 수 없는 문자는 사이트가 소유한 폰트를
-템플릿 디렉터리 아래에 두고 함께 지정합니다. Builder는 Sharp를 불러오기 전에
-해당 파일을 Fontconfig에 등록하므로 Linux CI·Docker에서도 같은 글리프를
-찾을 수 있습니다.
+템플릿 디렉터리 아래에 두고 함께 지정합니다. Builder는 해당 폰트를 resvg에 직접
+전달하므로 운영체제 Fontconfig와 무관하게 로컬·CI·Docker에서 같은 글리프를
+렌더링합니다.
 
 ```js
 og: {
   enabled: true,
-  fontFamily: "'Nanum Gothic', sans-serif",
+  fontFamily: "NanumGothic",
   fonts: [
     { file: "og/fonts/NanumGothic-Regular.ttf", weight: 400 },
     { file: "og/fonts/NanumGothic-Bold.ttf", weight: 700 }
