@@ -3,7 +3,7 @@ export { hashContent, shortHash, stableStringify } from "./hashing.js";
 export { escapeHtmlAttribute, escapeXml } from "./escape.js";
 export { assertSelfContainedSvg } from "./svg.js";
 export { image, optimizeImage, renderPictureHtml } from "./image.js";
-export { DEFAULT_OG_SVG_TEMPLATE, generateOgImage, planOgImage, renderOgSvg, } from "./og.js";
+export { generateOgImage, planOgImage, renderOgSvg, } from "./og.js";
 export { buildScriptEntries, planScriptEntries } from "./javascript.js";
 export { writeAssetManifest } from "./manifest.js";
 //# sourceMappingURL=index.js.map

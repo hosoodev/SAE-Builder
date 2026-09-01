@@ -172,7 +172,7 @@ test("filesystem path helpers reject traversal", () => {
   );
 });
 
-test("config requires CSS and JavaScript entries to be project-relative", () => {
+test("config requires asset and OG template entries to be project-relative", () => {
   assert.throws(
     () => resolveConfig({
       ...minimal,
@@ -184,6 +184,13 @@ test("config requires CSS and JavaScript entries to be project-relative", () => 
     () => resolveConfig({
       ...minimal,
       assets: { scripts: { main: path.resolve("outside.ts") } },
+    }, process.cwd()),
+    (error: unknown) => error instanceof BuilderError && error.code === "CONFIG_INVALID",
+  );
+  assert.throws(
+    () => resolveConfig({
+      ...minimal,
+      og: { templates: { default: "../outside.svg" } },
     }, process.cwd()),
     (error: unknown) => error instanceof BuilderError && error.code === "CONFIG_INVALID",
   );

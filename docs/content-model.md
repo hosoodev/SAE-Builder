@@ -73,9 +73,10 @@ available as `BuildResult.content`.
 
 When `og.enabled` is configured and `image` is absent, Builder creates a hashed
 1200×630 page OG image from the page title, description, collection, and site
-name. `ogTemplate` selects a configured self-contained SVG template; Builder
-never downloads fonts or external SVG resources. An explicit `image` always
-wins.
+name. The consumer must map `og.templates.default` to an SVG below its own
+`templates` directory; Builder has no design fallback. `ogTemplate` selects
+another consumer-owned template mapping. Builder never downloads fonts or
+external SVG resources. An explicit `image` always wins.
 
 `breadcrumbs` supplies visible-navigation-aligned ancestors for
 `BreadcrumbList`; Builder appends the current page. This is opt-in because Core

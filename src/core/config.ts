@@ -226,6 +226,9 @@ export function resolveConfig(
       assertRelativeProjectPath(`assets.${kind}.${name}`, value);
     }
   }
+  for (const [name, value] of Object.entries(parsed.data.og.templates)) {
+    assertRelativeProjectPath(`og.templates.${name}`, value);
+  }
 
   const explicitSiteDefault = input.site.defaultLocale;
   const explicitI18nDefault = input.i18n?.defaultLocale;

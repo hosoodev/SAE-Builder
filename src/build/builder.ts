@@ -41,6 +41,7 @@ import {
   discoverFiles,
   isInsideRoot,
   relativeInsideRoot,
+  readTextFile,
 } from "../filesystem/index.js";
 import {
   createTranslationAlternates,
@@ -845,6 +846,14 @@ async function planPageOgArtifacts(
 ): Promise<readonly PageOgArtifact[]> {
   if (!config.og.enabled) return [];
   const artifacts: PageOgArtifact[] = [];
+  const loadedTemplates = new Map<string, string>();
+  const loadOgTemplate = async (entry: string): Promise<string> => {
+    const cached = loadedTemplates.get(entry);
+    if (cached !== undefined) return cached;
+    const template = await readTextFile(config.resolvedPaths.templates, entry);
+    loadedTemplates.set(entry, template);
+    return template;
+  };
   for (const entry of entries) {
     if (entry.frontmatter.image !== undefined) continue;
     const requestedTemplate = entry.frontmatter.ogTemplate;
@@ -855,9 +864,16 @@ async function planPageOgArtifacts(
       );
     }
     const templateName = requestedTemplate ?? entry.frontmatter.layout;
-    const template = templateName === undefined
+    const templateEntry = templateName === undefined
       ? config.og.templates.default
       : config.og.templates[templateName] ?? config.og.templates.default;
+    if (templateEntry === undefined) {
+      throw new BuilderError(
+        "BUILD_FAILED",
+        `${entry.sourceRelativePath} needs an automatic OG image, but no site-owned OG template is configured.`,
+      );
+    }
+    const template = await loadOgTemplate(templateEntry);
     const planned: PlannedOgImage = await planOgImage({
       title: entry.frontmatter.title,
       subtitle: entry.frontmatter.description,

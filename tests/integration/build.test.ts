@@ -48,6 +48,7 @@ interface FixtureOptions {
   warningsAsErrors?: boolean;
   descriptionLength?: { min?: number; max?: number };
   ogEnabled?: boolean;
+  ogTemplate?: boolean;
   plugins?: string;
   integrations?: string;
 }
@@ -74,7 +75,10 @@ async function fixture(options: FixtureOptions = {}): Promise<string> {
       clean: ${options.clean ?? true},
       minifyHtml: ${options.minifyHtml ?? false}
     },
-    og: { enabled: ${options.ogEnabled ?? false} },
+    og: {
+      enabled: ${options.ogEnabled ?? false},
+      templates: ${options.ogTemplate === false ? "{}" : '{ default: "og/default.svg" }'}
+    },
     seo: {
       sitemap: ${options.sitemap ?? true},
       descriptionLength: ${JSON.stringify(options.descriptionLength ?? { min: 50, max: 160 })},
@@ -115,6 +119,12 @@ It renders complete static HTML and loads one explicit enhancement script.
 
 [Read about the fixture](/about/)
 `);
+  if (options.ogTemplate !== false) {
+    await write(root, "templates/og/default.svg", `<svg xmlns="http://www.w3.org/2000/svg" width="{{width}}" height="{{height}}">
+      <rect width="100%" height="100%" fill="#ffffff"/>
+      <text x="40" y="80" font-family="{{fontFamily}}">{{category}} {{title}} {{subtitle}} {{siteName}}</text>
+    </svg>`);
+  }
   await write(root, "content/pages/about.md", `---
 title: "About the deterministic fixture"
 description: "Background information about this deterministic Builder fixture."
@@ -266,6 +276,18 @@ test("configured automatic OG images are hashed, linked, cached, and check-safe"
     );
   } finally {
     await rm(checkRoot, { recursive: true, force: true });
+  }
+});
+
+test("automatic OG generation requires a site-owned default template", async () => {
+  const root = await fixture({ ogEnabled: true, ogTemplate: false });
+  try {
+    await assert.rejects(
+      () => build({ root, mode: "production" }),
+      /no site-owned OG template is configured/u,
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
   }
 });
 

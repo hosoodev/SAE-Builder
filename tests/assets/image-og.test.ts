@@ -15,6 +15,9 @@ const SOURCE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="
   <rect width="320" height="160" fill="#2563eb"/>
   <circle cx="160" cy="80" r="48" fill="#ffffff"/>
 </svg>`;
+const TEST_OG_TEMPLATE = `<svg xmlns="http://www.w3.org/2000/svg" width="{{width}}" height="{{height}}">
+  <text font-family="{{fontFamily}}">{{category}} {{title}} {{subtitle}} {{siteName}}</text>
+</svg>`;
 
 async function filesBelow(directory: string): Promise<string[]> {
   const result: string[] = [];
@@ -93,7 +96,7 @@ test("OG SVG data is XML escaped and raster hashes are deterministic", async (t)
     category: "Guide",
     siteName: "Example",
   };
-  const svg = renderOgSvg(data);
+  const svg = renderOgSvg(data, { template: TEST_OG_TEMPLATE });
   assert.match(svg, /A &amp; &lt;B&gt;/);
   assert.match(svg, /A &quot;quoted&quot; subtitle/);
   assert.doesNotMatch(svg, /<B>/);
@@ -103,6 +106,7 @@ test("OG SVG data is XML escaped and raster hashes are deterministic", async (t)
     cacheDirectory: cache,
     publicPath: "/og",
     filenameStem: "guide-card",
+    template: TEST_OG_TEMPLATE,
   };
   const first = await generateOgImage(data, options);
   const firstMtime = (await stat(first.filePath)).mtimeMs;

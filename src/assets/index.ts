@@ -12,7 +12,6 @@ export type {
   PictureHtmlOptions,
 } from "./image.js";
 export {
-  DEFAULT_OG_SVG_TEMPLATE,
   generateOgImage,
   planOgImage,
   renderOgSvg,

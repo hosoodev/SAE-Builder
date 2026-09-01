@@ -7,15 +7,6 @@ import { escapeXml } from "./escape.js";
 import { hashContent, stableStringify } from "./hashing.js";
 import { assertSelfContainedSvg } from "./svg.js";
 
-export const DEFAULT_OG_SVG_TEMPLATE = `<svg xmlns="http://www.w3.org/2000/svg" width="{{width}}" height="{{height}}" viewBox="0 0 {{width}} {{height}}">
-  <rect width="100%" height="100%" fill="#ffffff"/>
-  <rect x="64" y="64" width="1072" height="502" fill="none" stroke="#cbd5e1" stroke-width="2"/>
-  <text x="104" y="170" fill="#475569" font-family="{{fontFamily}}" font-size="28">{{category}}</text>
-  <text x="104" y="300" fill="#0f172a" font-family="{{fontFamily}}" font-size="60" font-weight="700">{{title}}</text>
-  <text x="104" y="390" fill="#475569" font-family="{{fontFamily}}" font-size="30">{{subtitle}}</text>
-  <text x="104" y="510" fill="#0f172a" font-family="{{fontFamily}}" font-size="26">{{siteName}}</text>
-</svg>`;
-
 export interface OgTemplateData {
   readonly title: string;
   readonly subtitle?: string;
@@ -27,7 +18,7 @@ export interface RenderOgSvgOptions {
   readonly width?: number;
   readonly height?: number;
   readonly fontFamily?: string;
-  readonly template?: string;
+  readonly template: string;
 }
 
 export interface GenerateOgImageOptions extends RenderOgSvgOptions {
@@ -78,10 +69,10 @@ function dimension(value: number, name: string): number {
   return value;
 }
 
-export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions = {}): string {
+export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): string {
   const width = dimension(options.width ?? 1200, "OG width");
   const height = dimension(options.height ?? 630, "OG height");
-  const template = options.template ?? DEFAULT_OG_SVG_TEMPLATE;
+  const template = options.template;
   assertSelfContainedSvg(template, "OG template");
   const values: Record<string, string> = {
     width: String(width),
@@ -126,7 +117,7 @@ export async function generateOgImage(
 
 export async function planOgImage(
   data: OgTemplateData,
-  options: PlanOgImageOptions = {},
+  options: PlanOgImageOptions,
 ): Promise<PlannedOgImage> {
   const width = dimension(options.width ?? 1200, "OG width");
   const height = dimension(options.height ?? 630, "OG height");

@@ -37,7 +37,7 @@ src/
   markdown/     unified pipeline and restricted MDX handling
   template/     layouts, partials, escaping, dependency collection
   routing/      slug normalization and output mapping
-  assets/       CSS/TypeScript entries, responsive images, automatic OG assets
+  assets/       CSS/TypeScript entries, responsive images, OG rendering engine
   seo/          metadata, JSON-LD, sitemap, RSS, robots, HTML checks
   plugin/       typed hooks and deterministic ordering
   build/        orchestration, graph, cache, build/check result

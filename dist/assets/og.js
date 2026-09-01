@@ -4,24 +4,16 @@ import { getOrCreateArtifact, materializeIfChanged } from "./artifact-cache.js";
 import { escapeXml } from "./escape.js";
 import { hashContent, stableStringify } from "./hashing.js";
 import { assertSelfContainedSvg } from "./svg.js";
-export const DEFAULT_OG_SVG_TEMPLATE = `<svg xmlns="http://www.w3.org/2000/svg" width="{{width}}" height="{{height}}" viewBox="0 0 {{width}} {{height}}">
-  <rect width="100%" height="100%" fill="#ffffff"/>
-  <rect x="64" y="64" width="1072" height="502" fill="none" stroke="#cbd5e1" stroke-width="2"/>
-  <text x="104" y="170" fill="#475569" font-family="{{fontFamily}}" font-size="28">{{category}}</text>
-  <text x="104" y="300" fill="#0f172a" font-family="{{fontFamily}}" font-size="60" font-weight="700">{{title}}</text>
-  <text x="104" y="390" fill="#475569" font-family="{{fontFamily}}" font-size="30">{{subtitle}}</text>
-  <text x="104" y="510" fill="#0f172a" font-family="{{fontFamily}}" font-size="26">{{siteName}}</text>
-</svg>`;
 function dimension(value, name) {
     if (!Number.isInteger(value) || value < 1 || value > 4096) {
         throw new RangeError(`${name} must be an integer between 1 and 4096.`);
     }
     return value;
 }
-export function renderOgSvg(data, options = {}) {
+export function renderOgSvg(data, options) {
     const width = dimension(options.width ?? 1200, "OG width");
     const height = dimension(options.height ?? 630, "OG height");
-    const template = options.template ?? DEFAULT_OG_SVG_TEMPLATE;
+    const template = options.template;
     assertSelfContainedSvg(template, "OG template");
     const values = {
         width: String(width),
@@ -60,7 +52,7 @@ export async function generateOgImage(data, options) {
         cacheHit: planned.cacheHit,
     });
 }
-export async function planOgImage(data, options = {}) {
+export async function planOgImage(data, options) {
     const width = dimension(options.width ?? 1200, "OG width");
     const height = dimension(options.height ?? 630, "OG height");
     const format = options.format ?? "png";

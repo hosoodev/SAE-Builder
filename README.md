@@ -8,7 +8,7 @@ HTML-first SEO/AEO 정적 사이트 빌더이며 `@hosoodev/sae-builder` 패키�
 현재 공개 GitHub 릴리스에서 설치할 수 있습니다.
 
 ```bash
-pnpm add -D github:hosoodev/SAE-Builder#v0.2.4
+pnpm add -D github:hosoodev/SAE-Builder#v0.3.0
 ```
 
 설치 후 사이트의 `package.json`에서 다음 명령을 연결합니다.
@@ -136,6 +136,9 @@ corepack pnpm benchmark -- --pages 100,1000 --require-incremental-mtimes
 `ContentRepository`, `image`, `createPluginRunner`와 관련 타입을 공개합니다.
 `assets.optimizeImage()`/`image()`는 intrinsic size와 WebP/AVIF `<picture>`를 만들고,
 `og.enabled`는 명시적 `image`가 없는 페이지에 해시 OG 파일을 자동 연결합니다.
+OG 디자인은 Builder에 내장하지 않습니다. 소비 사이트가 자신의 `templates`
+디렉터리에 SVG를 두고 `og.templates.default: "og/default.svg"`처럼 지정해야 합니다.
+Builder는 사이트 템플릿의 안전성 검사·변수 치환·래스터 변환·해싱만 담당합니다.
 플러그인 산출물도 Core/public/SEO/OG 산출물과 같은 소유권 검사를 거칩니다.
 
 `BuildResult.incremental`은 `renderedPages`, `reusedPages`, invalidated output과

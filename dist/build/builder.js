@@ -3,7 +3,7 @@ import { mkdir, readFile, rm, writeFile, } from "node:fs/promises";
 import { hashContent, planCssEntries, planOgImage, planScriptEntries, stableStringify, writeAssetManifest, } from "../assets/index.js";
 import { BuilderError, createBuildContext, loadConfig, resolveConfig, serializePublicUrl, } from "../core/index.js";
 import { createContentRepository, loadContent, } from "../content/index.js";
-import { assertInsideRoot, assertNoSymlinkPath, copyDirectory, discoverFiles, isInsideRoot, relativeInsideRoot, } from "../filesystem/index.js";
+import { assertInsideRoot, assertNoSymlinkPath, copyDirectory, discoverFiles, isInsideRoot, relativeInsideRoot, readTextFile, } from "../filesystem/index.js";
 import { createTranslationAlternates, localizeRoute, renderHreflangTags, } from "../i18n/index.js";
 import { buildMetadata, createArticleSchema, createBreadcrumbListSchema, createJsonLdGraph, createFaqPageSchema, createOrganizationSchema, createWebApplicationSchema, createWebPageSchema, createWebSiteSchema, daumWebmasterComment, diagnoseSeoSite, generateGoogleAdsTxt, generateRobotsTxt, generateRss, planLocalizedSitemaps, renderJsonLd, renderIntegrationHead, renderMetadataTags, resolveSiteUrl, } from "../seo/index.js";
 import { FileTemplateLoader } from "../template/index.js";
@@ -563,6 +563,15 @@ async function planPageOgArtifacts(config, entries, useCache) {
     if (!config.og.enabled)
         return [];
     const artifacts = [];
+    const loadedTemplates = new Map();
+    const loadOgTemplate = async (entry) => {
+        const cached = loadedTemplates.get(entry);
+        if (cached !== undefined)
+            return cached;
+        const template = await readTextFile(config.resolvedPaths.templates, entry);
+        loadedTemplates.set(entry, template);
+        return template;
+    };
     for (const entry of entries) {
         if (entry.frontmatter.image !== undefined)
             continue;
@@ -571,9 +580,13 @@ async function planPageOgArtifacts(config, entries, useCache) {
             throw new BuilderError("BUILD_FAILED", `${entry.sourceRelativePath} references unknown OG template '${requestedTemplate}'.`);
         }
         const templateName = requestedTemplate ?? entry.frontmatter.layout;
-        const template = templateName === undefined
+        const templateEntry = templateName === undefined
             ? config.og.templates.default
             : config.og.templates[templateName] ?? config.og.templates.default;
+        if (templateEntry === undefined) {
+            throw new BuilderError("BUILD_FAILED", `${entry.sourceRelativePath} needs an automatic OG image, but no site-owned OG template is configured.`);
+        }
+        const template = await loadOgTemplate(templateEntry);
         const planned = await planOgImage({
             title: entry.frontmatter.title,
             subtitle: entry.frontmatter.description,

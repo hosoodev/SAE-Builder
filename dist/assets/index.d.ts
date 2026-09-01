@@ -4,7 +4,7 @@ export { escapeHtmlAttribute, escapeXml } from "./escape.js";
 export { assertSelfContainedSvg } from "./svg.js";
 export { image, optimizeImage, renderPictureHtml } from "./image.js";
 export type { ImageHelperOptions, OptimizeImageOptions, OptimizedImageFormat, OptimizedImageResult, OptimizedImageVariant, PictureHtmlOptions, } from "./image.js";
-export { DEFAULT_OG_SVG_TEMPLATE, generateOgImage, planOgImage, renderOgSvg, } from "./og.js";
+export { generateOgImage, planOgImage, renderOgSvg, } from "./og.js";
 export type { GeneratedOgImage, GenerateOgImageOptions, OgTemplateData, PlannedOgImage, PlanOgImageOptions, RenderOgSvgOptions, } from "./og.js";
 export { buildScriptEntries, planScriptEntries } from "./javascript.js";
 export { writeAssetManifest } from "./manifest.js";
