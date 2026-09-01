@@ -102,13 +102,10 @@ export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): 
   };
   const titleLines = wrap(data.title, 24, 2);
   const subtitleLines = wrap(data.subtitle ?? "", 42, 3);
-  const embeddedFamily = "SaeOgEmbedded";
   const values: Record<string, string> = {
     width: String(width),
     height: String(height),
-    fontFamily: options.fonts?.length
-      ? `'${embeddedFamily}', ${options.fontFamily ?? "sans-serif"}`
-      : options.fontFamily ?? "Arial, sans-serif",
+    fontFamily: options.fontFamily ?? "Arial, sans-serif",
     title: data.title,
     titleLine1: titleLines[0] ?? "",
     titleLine2: titleLines[1] ?? "",
@@ -124,18 +121,7 @@ export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): 
     return escapeXml(values[key] ?? "");
   });
   if (/\{\{[^}]+\}\}/.test(rendered)) throw new Error("OG template contains an unresolved placeholder.");
-  const fontFaces = (options.fonts ?? []).map((font) => {
-    const weight = font.weight ?? 400;
-    if (!Number.isInteger(weight) || weight < 1 || weight > 1000) {
-      throw new RangeError("OG font weight must be an integer between 1 and 1000.");
-    }
-    const base64 = Buffer.from(font.contents).toString("base64");
-    return `@font-face{font-family:'${embeddedFamily}';src:url(data:${font.mimeType};base64,${base64}) format('${font.format}');font-weight:${weight};font-style:${font.style ?? "normal"};}`;
-  }).join("");
-  const withFonts = fontFaces
-    ? rendered.replace(/(<svg\b[^>]*>)/u, `$1<style>${fontFaces}</style>`)
-    : rendered;
-  return withFonts;
+  return rendered;
 }
 
 function safeStem(value: string): string {
@@ -183,6 +169,11 @@ export async function planOgImage(
     height,
     format,
     quality,
+    fonts: (options.fonts ?? []).map((font) => ({
+      hash: hashContent(font.contents),
+      weight: font.weight ?? 400,
+      style: font.style ?? "normal",
+    })),
     sharp: sharp.versions.sharp,
   }));
   const create = async () => {

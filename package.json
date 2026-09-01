@@ -1,6 +1,6 @@
 {
   "name": "@hosoodev/sae-builder",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "type": "module",
   "description": "HTML-first SEO/AEO static site builder",
   "packageManager": "pnpm@10.34.5",

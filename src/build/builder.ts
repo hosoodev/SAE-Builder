@@ -99,7 +99,7 @@ import {
   type OutputSyncResult,
 } from "./incremental.js";
 
-export const BUILDER_VERSION = "0.3.2";
+export const BUILDER_VERSION = "0.3.4";
 
 export interface BuildOptions {
   root?: string;
