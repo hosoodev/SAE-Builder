@@ -58,6 +58,10 @@ export interface SeoConfig {
   rss: boolean;
   robots: boolean;
   jsonLd: boolean;
+  descriptionLength: {
+    min?: number;
+    max?: number;
+  };
   feed: {
     title?: string;
     description?: string;

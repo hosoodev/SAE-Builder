@@ -46,6 +46,7 @@ interface FixtureOptions {
   forbiddenElements?: readonly string[];
   forbiddenClasses?: readonly string[];
   warningsAsErrors?: boolean;
+  descriptionLength?: { min?: number; max?: number };
   ogEnabled?: boolean;
   plugins?: string;
   integrations?: string;
@@ -76,6 +77,7 @@ async function fixture(options: FixtureOptions = {}): Promise<string> {
     og: { enabled: ${options.ogEnabled ?? false} },
     seo: {
       sitemap: ${options.sitemap ?? true},
+      descriptionLength: ${JSON.stringify(options.descriptionLength ?? { min: 50, max: 160 })},
       feed: { description: "Fixture site feed" }
     },
     integrations: ${options.integrations ?? "{}"},
@@ -748,6 +750,18 @@ test("builder forwards forbidden element and class lint configuration", async ()
         return true;
       },
     );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("builder forwards site-specific meta description length guidance", async () => {
+  const root = await fixture({ descriptionLength: { min: 98, max: 98 } });
+  try {
+    const result = await check({ root, mode: "production" });
+    const diagnostic = result.diagnostics.find(({ ruleId }) => ruleId === "seo/description-length");
+    assert.ok(diagnostic);
+    assert.match(diagnostic.message, /configured minimum is 98/u);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

@@ -20,6 +20,15 @@
 Warnings may be promoted to errors through config. Diagnostics include rule id,
 source, route, and a useful message; their order is deterministic.
 
+Meta description guidance defaults to 50-160 characters and can be tightened
+per consumer without changing page text automatically:
+
+```js
+seo: {
+  descriptionLength: { min: 98, max: 98 }
+}
+```
+
 ## Metadata and canonical policy
 
 Every rendered page has one title, description, canonical, Open Graph title,

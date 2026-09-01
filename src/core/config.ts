@@ -37,6 +37,14 @@ const collectionDefinitionSchema = z.custom<ContentCollectionDefinition>((value)
     && (definition.schema === undefined || typeof definition.schema.parse === "function");
 }, "Invalid collection definition");
 
+const lengthGuidanceSchema = z.object({
+  min: z.number().int().nonnegative().optional(),
+  max: z.number().int().nonnegative().optional(),
+}).strict().refine(
+  ({ min, max }) => min === undefined || max === undefined || min <= max,
+  { message: "Minimum length must not exceed maximum length." },
+);
+
 const configSchema = z.object({
   site: z.object({
     name: z.string().trim().min(1),
@@ -129,6 +137,7 @@ const configSchema = z.object({
     rss: z.boolean().default(true),
     robots: z.boolean().default(true),
     jsonLd: z.boolean().default(true),
+    descriptionLength: lengthGuidanceSchema.default({ min: 50, max: 160 }),
     feed: z.object({
       title: z.string().optional(),
       description: z.string().optional(),
@@ -143,6 +152,7 @@ const configSchema = z.object({
     rss: true,
     robots: true,
     jsonLd: true,
+    descriptionLength: { min: 50, max: 160 },
     feed: {},
     robotsRules: [{ userAgent: "*", allow: ["/"] }],
   }),

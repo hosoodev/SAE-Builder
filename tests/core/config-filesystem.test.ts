@@ -28,9 +28,26 @@ test("config defaults resolve every path under the consumer root", () => {
   assert.equal(config.site.defaultLocale, "en");
   assert.equal(config.site.url, "https://example.test/");
   assert.deepEqual(config.integrations, {});
+  assert.deepEqual(config.seo.descriptionLength, { min: 50, max: 160 });
   for (const target of Object.values(config.resolvedPaths)) {
     assert.equal(isInsideRoot(root, target), true);
   }
+});
+
+test("config accepts site-specific meta description length guidance", () => {
+  const config = resolveConfig({
+    ...minimal,
+    seo: { descriptionLength: { min: 98, max: 98 } },
+  }, process.cwd());
+  assert.deepEqual(config.seo.descriptionLength, { min: 98, max: 98 });
+
+  assert.throws(
+    () => resolveConfig({
+      ...minimal,
+      seo: { descriptionLength: { min: 99, max: 98 } },
+    }, process.cwd()),
+    (error: unknown) => error instanceof BuilderError && error.code === "CONFIG_INVALID",
+  );
 });
 
 test("config preserves a readable internationalized site hostname", () => {

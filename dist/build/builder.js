@@ -882,6 +882,7 @@ async function runBuild(options) {
                 locales: config.site.locales,
                 entryRoutes: config.i18n.locales.map((locale) => localizeRoute("/", locale, config.i18n)),
                 knownPaths,
+                descriptionLength: config.seo.descriptionLength,
                 forbiddenElements: config.lint.forbiddenElements,
                 forbiddenClasses: config.lint.forbiddenClasses,
                 warningAsError: config.lint.warningsAsErrors,
