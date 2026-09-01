@@ -93,6 +93,7 @@ export interface OgConfig {
     weight: number;
     style: "normal" | "italic";
   }>;
+  assets: Record<string, string>;
   templates: Record<string, string>;
 }
 

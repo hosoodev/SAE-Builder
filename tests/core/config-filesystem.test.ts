@@ -201,6 +201,13 @@ test("config requires asset and OG template entries to be project-relative", () 
     }, process.cwd()),
     (error: unknown) => error instanceof BuilderError && error.code === "CONFIG_INVALID",
   );
+  assert.throws(
+    () => resolveConfig({
+      ...minimal,
+      og: { assets: { logo: "../outside.svg" } },
+    }, process.cwd()),
+    (error: unknown) => error instanceof BuilderError && error.code === "CONFIG_INVALID",
+  );
 });
 
 test("filesystem entry resolution rejects absolute paths, traversal, and symlink ancestors", async (t) => {

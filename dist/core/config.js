@@ -104,6 +104,7 @@ const configSchema = z.object({
             weight: z.number().int().min(1).max(1000).default(400),
             style: z.enum(["normal", "italic"]).default("normal"),
         }).strict()).max(8).default([]),
+        assets: z.record(z.string().regex(/^[A-Za-z][A-Za-z0-9]*$/u), z.string().trim().min(1)).default({}),
         templates: z.record(z.string(), z.string().min(1)).default({}),
     }).strict().default({
         enabled: false,
@@ -112,6 +113,7 @@ const configSchema = z.object({
         format: "png",
         quality: 90,
         fonts: [],
+        assets: {},
         templates: {},
     }),
     seo: z.object({
@@ -202,6 +204,9 @@ export function resolveConfig(input, root, configFile = path.join(root, "builder
     }
     for (const [index, font] of parsed.data.og.fonts.entries()) {
         assertRelativeProjectPath(`og.fonts.${index}.file`, font.file);
+    }
+    for (const [name, value] of Object.entries(parsed.data.og.assets)) {
+        assertRelativeProjectPath(`og.assets.${name}`, value);
     }
     const explicitSiteDefault = input.site.defaultLocale;
     const explicitI18nDefault = input.i18n?.defaultLocale;

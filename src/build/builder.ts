@@ -851,6 +851,37 @@ async function planPageOgArtifacts(
   if (!config.og.enabled) return [];
   const artifacts: PageOgArtifact[] = [];
   const loadedTemplates = new Map<string, string>();
+  let loadedAssets: Promise<Readonly<Record<string, string>>> | undefined;
+  const loadOgAssets = (): Promise<Readonly<Record<string, string>>> => {
+    loadedAssets ??= Promise.all(Object.entries(config.og.assets).map(async ([name, entry]) => {
+      const source = await resolveFileInsideRoot(
+        config.resolvedPaths.public,
+        entry,
+        `OG asset '${name}'`,
+      );
+      const extension = path.extname(source).toLowerCase();
+      const mimeTypes: Record<string, string> = {
+        ".svg": "image/svg+xml",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".webp": "image/webp",
+      };
+      const mimeType = mimeTypes[extension];
+      if (mimeType === undefined) {
+        throw new BuilderError(
+          "BUILD_FAILED",
+          `Unsupported OG asset format '${extension || "(none)"}' for ${entry}.`,
+        );
+      }
+      const contents = await readFile(source);
+      if (contents.byteLength > 5 * 1024 * 1024) {
+        throw new BuilderError("BUILD_FAILED", `OG asset is larger than 5 MiB: ${entry}.`);
+      }
+      return [name, `data:${mimeType};base64,${contents.toString("base64")}`] as const;
+    })).then(Object.fromEntries);
+    return loadedAssets;
+  };
   let loadedFonts: Promise<readonly EmbeddedOgFont[]> | undefined;
   const loadOgFonts = (): Promise<readonly EmbeddedOgFont[]> => {
     loadedFonts ??= Promise.all(config.og.fonts.map(async (font) => {
@@ -916,6 +947,7 @@ async function planPageOgArtifacts(
       quality: config.og.quality,
       fontFamily: config.og.fontFamily,
       fonts: await loadOgFonts(),
+      assets: await loadOgAssets(),
       template,
       filenameStem: ogFilenameStem(entry),
       publicPath: "/assets/og",

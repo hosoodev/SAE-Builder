@@ -8,7 +8,7 @@ HTML-first SEO/AEO 정적 사이트 빌더이며 `@hosoodev/sae-builder` 패키�
 현재 공개 GitHub 릴리스에서 설치할 수 있습니다.
 
 ```bash
-pnpm add -D github:hosoodev/SAE-Builder#v0.3.5
+pnpm add -D github:hosoodev/SAE-Builder#v0.3.6
 ```
 
 설치 후 사이트의 `package.json`에서 다음 명령을 연결합니다.
@@ -155,6 +155,7 @@ og: {
     { file: "og/fonts/NanumGothic-Regular.ttf", weight: 400 },
     { file: "og/fonts/NanumGothic-Bold.ttf", weight: 700 }
   ],
+  assets: { logo: "logo.svg" },
   templates: { default: "og/default.svg" }
 }
 ```
@@ -162,6 +163,9 @@ og: {
 SVG 템플릿은 원문 `title`, `subtitle` 외에도 `titleLine1`,
 `titleLine2`, `subtitleLine1`부터 `subtitleLine3`까지 사용할 수 있습니다.
 줄 단위 placeholder를 `tspan`에 배치하면 긴 문구가 이미지 밖으로 넘치지 않습니다.
+`og.assets`는 사이트의 `public` 디렉터리에 이미 존재하는 SVG·PNG·JPEG·WebP를
+가리킵니다. Builder가 파일을 data URI로 포함하므로 템플릿의
+`<image href="{{logo}}">`처럼 기존 로고를 그대로 재사용할 수 있습니다.
 플러그인 산출물도 Core/public/SEO/OG 산출물과 같은 소유권 검사를 거칩니다.
 
 `BuildResult.incremental`은 `renderedPages`, `reusedPages`, invalidated output과

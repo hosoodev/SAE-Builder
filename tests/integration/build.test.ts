@@ -77,6 +77,7 @@ async function fixture(options: FixtureOptions = {}): Promise<string> {
     },
     og: {
       enabled: ${options.ogEnabled ?? false},
+      assets: { logo: "logo.svg" },
       templates: ${options.ogTemplate === false ? "{}" : '{ default: "og/default.svg" }'}
     },
     seo: {
@@ -120,10 +121,12 @@ It renders complete static HTML and loads one explicit enhancement script.
 [Read about the fixture](/about/)
 `);
   if (options.ogTemplate !== false) {
-    await write(root, "templates/og/default.svg", `<svg xmlns="http://www.w3.org/2000/svg" width="{{width}}" height="{{height}}">
-      <rect width="100%" height="100%" fill="#ffffff"/>
-      <text x="40" y="80" font-family="{{fontFamily}}">{{category}} {{title}} {{subtitle}} {{siteName}}</text>
-    </svg>`);
+  await write(root, "templates/og/default.svg", `<svg xmlns="http://www.w3.org/2000/svg" width="{{width}}" height="{{height}}">
+    <rect width="100%" height="100%" fill="#ffffff"/>
+    <image href="{{logo}}" width="24" height="24"/>
+    <text x="40" y="80" font-family="{{fontFamily}}">{{category}} {{title}} {{subtitle}} {{siteName}}</text>
+  </svg>`);
+  await write(root, "public/logo.svg", `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><rect width="24" height="24" fill="#123456"/></svg>`);
   }
   await write(root, "content/pages/about.md", `---
 title: "About the deterministic fixture"

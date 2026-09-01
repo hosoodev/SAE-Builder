@@ -17,6 +17,7 @@ export interface RenderOgSvgOptions {
   readonly height?: number;
   readonly fontFamily?: string;
   readonly fonts?: readonly EmbeddedOgFont[];
+  readonly assets?: Readonly<Record<string, string>>;
   readonly template: string;
 }
 
@@ -116,11 +117,19 @@ export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): 
     category: data.category ?? "",
     siteName: data.siteName ?? "",
   };
+  for (const [name, value] of Object.entries(options.assets ?? {})) {
+    if (name in values) throw new Error(`OG asset placeholder '${name}' is reserved.`);
+    if (!/^data:image\/(?:svg\+xml|png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/u.test(value)) {
+      throw new Error(`OG asset '${name}' must be a supported image data URI.`);
+    }
+    values[name] = value;
+  }
   const rendered = template.replace(/\{\{\s*([A-Za-z][A-Za-z0-9]*)\s*\}\}/g, (placeholder, key: string) => {
     if (!(key in values)) throw new Error(`Unknown OG template placeholder: ${placeholder}`);
     return escapeXml(values[key] ?? "");
   });
   if (/\{\{[^}]+\}\}/.test(rendered)) throw new Error("OG template contains an unresolved placeholder.");
+  assertSelfContainedSvg(rendered, "Rendered OG template");
   return rendered;
 }
 

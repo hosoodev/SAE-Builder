@@ -9,6 +9,7 @@ export interface RenderOgSvgOptions {
     readonly height?: number;
     readonly fontFamily?: string;
     readonly fonts?: readonly EmbeddedOgFont[];
+    readonly assets?: Readonly<Record<string, string>>;
     readonly template: string;
 }
 export interface EmbeddedOgFont {

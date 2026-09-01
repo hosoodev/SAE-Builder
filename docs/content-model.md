@@ -78,6 +78,9 @@ name. A consumer may map `og.templates.default` to an SVG below its own
 template exists, Builder skips automatic OG generation for that page.
 `ogTemplate` selects another consumer-owned template mapping. Builder never
 downloads fonts or external SVG resources. An explicit `image` always wins.
+Consumer-owned images such as an existing logo can be mapped from the public
+directory through `og.assets`; Builder embeds them as data URIs for named
+template placeholders instead of duplicating brand artwork.
 
 `breadcrumbs` supplies visible-navigation-aligned ancestors for
 `BreadcrumbList`; Builder appends the current page. This is opt-in because Core
