@@ -1,4 +1,5 @@
 import { resolveSiteUrl } from "./metadata.js";
+import { serializePublicUrl } from "../core/url.js";
 function compareText(left, right) {
     return left < right ? -1 : left > right ? 1 : 0;
 }
@@ -45,7 +46,7 @@ export function generateRobotsTxt(options) {
         if (url.protocol !== "https:" && url.protocol !== "http:") {
             throw new TypeError(`Sitemap URL must be absolute HTTP(S): ${value}`);
         }
-        return url.href;
+        return serializePublicUrl(url);
     }) ?? [resolveSiteUrl(options.siteUrl, options.sitemapPath ?? "/sitemap.xml")];
     const uniqueSitemaps = [...new Set(sitemapUrls)].sort(compareText);
     if (lines.length > 0 && uniqueSitemaps.length > 0)

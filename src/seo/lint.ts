@@ -1,4 +1,5 @@
 import { parse } from "parse5";
+import { serializePublicUrl } from "../core/url.js";
 
 import {
   canonicalBelongsToSite,
@@ -355,7 +356,7 @@ function analyzePage(page: SeoHtmlPage, options: SeoDiagnosticOptions): PageAnal
       if ((parsed.protocol !== "https:" && parsed.protocol !== "http:") || parsed.username || parsed.password || parsed.hash) {
         throw new TypeError("Canonical URL must be HTTP(S), credential-free, and fragment-free.");
       }
-      canonical = parsed.href;
+      canonical = serializePublicUrl(parsed);
       if (route) {
         const expected = resolveCanonical({ siteUrl: options.siteUrl, route, canonical: page.canonical });
         if (expected !== canonical) {
@@ -455,7 +456,7 @@ function analyzePage(page: SeoHtmlPage, options: SeoDiagnosticOptions): PageAnal
           try {
             const parsedSchemaUrl = new URL(schemaUrl);
             if (parsedSchemaUrl.protocol !== "https:" && parsedSchemaUrl.protocol !== "http:") throw new TypeError();
-            if (parsedSchemaUrl.href !== canonical) {
+            if (serializePublicUrl(parsedSchemaUrl) !== canonical) {
               pushDiagnostic(diagnostics, page, "seo/jsonld-url-mismatch", "error", `JSON-LD page URL ${schemaUrl} does not match canonical ${canonical}.`, script);
             }
           } catch {
@@ -502,7 +503,7 @@ function analyzePage(page: SeoHtmlPage, options: SeoDiagnosticOptions): PageAnal
       try {
         const absolute = new URL(href);
         if (absolute.protocol !== "https:" && absolute.protocol !== "http:") throw new TypeError();
-        alternates.set(language, absolute.href);
+        alternates.set(language, serializePublicUrl(absolute));
       } catch {
         pushDiagnostic(diagnostics, page, "seo/hreflang-invalid", "error", `hreflang ${language} must use an absolute HTTP(S) URL.`, link);
       }

@@ -1,4 +1,5 @@
 import { resolveSiteUrl } from "./metadata.js";
+import { serializePublicUrl } from "../core/url.js";
 
 export interface RobotsRule {
   readonly userAgent: string;
@@ -64,7 +65,7 @@ export function generateRobotsTxt(options: RobotsOptions): string {
     if (url.protocol !== "https:" && url.protocol !== "http:") {
       throw new TypeError(`Sitemap URL must be absolute HTTP(S): ${value}`);
     }
-    return url.href;
+    return serializePublicUrl(url);
   }) ?? [resolveSiteUrl(options.siteUrl, options.sitemapPath ?? "/sitemap.xml")];
   const uniqueSitemaps = [...new Set(sitemapUrls)].sort(compareText);
   if (lines.length > 0 && uniqueSitemaps.length > 0) lines.push("");

@@ -46,6 +46,26 @@ test("canonical and metadata helpers honor a configured site base", () => {
   assert.match(tags, /<meta name="robots" content="noindex,follow">/u);
 });
 
+test("internationalized hostnames remain readable in public metadata", () => {
+  const metadata = buildMetadata({
+    siteUrl: "https://영문주소변환.kr",
+    route: "/guides",
+    title: "Guide",
+    description: "Guide description",
+    image: "/og.png",
+  });
+  assert.equal(metadata.canonical, "https://영문주소변환.kr/guides");
+  assert.equal(metadata.openGraph.image, "https://영문주소변환.kr/og.png");
+  assert.match(renderMetadataTags(metadata), /https:\/\/영문주소변환\.kr\/guides/u);
+
+  const article = createArticleSchema({
+    name: "Guide",
+    description: "Guide description",
+    url: metadata.canonical,
+  });
+  assert.equal(article.url, "https://영문주소변환.kr/guides");
+});
+
 test("JSON-LD helpers serialize deterministically and safely without inventing dates or authors", () => {
   const article = createArticleSchema({
     name: "Guide </script>",

@@ -1,6 +1,7 @@
 import { canonicalBelongsToSite, normalizeSiteBase, resolveCanonical, resolveSiteUrl } from "./metadata.js";
 import { validateSeoDate } from "./sitemap.js";
 import { escapeXml } from "./xml.js";
+import { serializePublicUrl } from "../core/url.js";
 
 export interface RssItemInput {
   readonly route: string;
@@ -78,7 +79,7 @@ export function generateRss(items: readonly RssItemInput[], options: RssOptions)
   }
 
   const feedUrl = resolveSiteUrl(options.siteUrl, options.path ?? "/rss.xml");
-  const siteUrl = normalizeSiteBase(options.siteUrl).href;
+  const siteUrl = serializePublicUrl(normalizeSiteBase(options.siteUrl));
   const hasAuthor = resolved.some((item) => item.author?.trim());
   const namespace = hasAuthor
     ? ' xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/"'

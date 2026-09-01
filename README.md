@@ -8,7 +8,7 @@ HTML-first SEO/AEO 정적 사이트 빌더이며 `@hosoodev/sae-builder` 패키�
 현재 공개 GitHub 릴리스에서 설치할 수 있습니다.
 
 ```bash
-pnpm add -D github:hosoodev/SAE-Builder#v0.2.2
+pnpm add -D github:hosoodev/SAE-Builder#v0.2.3
 ```
 
 설치 후 사이트의 `package.json`에서 다음 명령을 연결합니다.

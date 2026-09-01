@@ -1,5 +1,6 @@
 import { canonicalBelongsToSite, resolveCanonical } from "./metadata.js";
 import { escapeXml } from "./xml.js";
+import { serializePublicUrl } from "../core/url.js";
 
 export type SitemapChangeFrequency =
   | "always"
@@ -134,7 +135,7 @@ export function generateSitemapIndex(entries: readonly SitemapIndexEntry[]): str
     ) {
       throw new TypeError(`Sitemap index URL must be absolute HTTP(S): ${entry.url}`);
     }
-    return { url: url.href, lastmod: entry.lastmod };
+    return { url: serializePublicUrl(url), lastmod: entry.lastmod };
   });
   normalized.sort((left, right) => compareText(left.url, right.url));
   for (let index = 1; index < normalized.length; index += 1) {

@@ -1,7 +1,7 @@
 import path from "node:path";
 import { mkdir, readFile, rm, writeFile, } from "node:fs/promises";
 import { hashContent, planCssEntries, planOgImage, planScriptEntries, stableStringify, writeAssetManifest, } from "../assets/index.js";
-import { BuilderError, createBuildContext, loadConfig, resolveConfig, } from "../core/index.js";
+import { BuilderError, createBuildContext, loadConfig, resolveConfig, serializePublicUrl, } from "../core/index.js";
 import { createContentRepository, loadContent, } from "../content/index.js";
 import { assertInsideRoot, assertNoSymlinkPath, copyDirectory, discoverFiles, isInsideRoot, relativeInsideRoot, } from "../filesystem/index.js";
 import { createTranslationAlternates, localizeRoute, renderHreflangTags, } from "../i18n/index.js";
@@ -86,7 +86,7 @@ function manifestUnderSiteBase(manifest, siteUrl) {
 function resolveSiteAssetUrl(siteUrl, value) {
     return value.startsWith("/")
         ? resolveSiteUrl(siteUrl, value)
-        : new URL(value, siteUrl).href;
+        : serializePublicUrl(new URL(value, siteUrl));
 }
 function stagePathFor(config) {
     stageSequence += 1;
@@ -271,7 +271,7 @@ function schemasForPage(config, entry, metadata) {
         nodes.push(createOrganizationSchema({
             name: config.site.organization.name,
             url: config.site.organization.url ?? config.site.url,
-            id: new URL("#organization", config.site.url).href,
+            id: serializePublicUrl(new URL("#organization", config.site.url)),
             logo: config.site.organization.logo
                 ? resolveSiteAssetUrl(config.site.url, config.site.organization.logo)
                 : undefined,
@@ -293,7 +293,7 @@ function schemasForPage(config, entry, metadata) {
                 ? {
                     name: config.site.organization.name,
                     url: config.site.organization.url ?? config.site.url,
-                    id: new URL("#organization", config.site.url).href,
+                    id: serializePublicUrl(new URL("#organization", config.site.url)),
                 }
                 : undefined,
         }));
@@ -314,7 +314,7 @@ function schemasForPage(config, entry, metadata) {
             name: item.name,
             url: item.url.startsWith("/")
                 ? resolveSiteUrl(config.site.url, item.url)
-                : new URL(item.url, config.site.url).href,
+                : serializePublicUrl(new URL(item.url, config.site.url)),
         }));
         if (breadcrumbItems.at(-1)?.url !== metadata.canonical) {
             breadcrumbItems.push({ name: fm.title, url: metadata.canonical });

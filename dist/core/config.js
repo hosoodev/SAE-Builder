@@ -6,6 +6,7 @@ import { z } from "zod";
 import { normalizeCollectionDefinitions, } from "../content/collection.js";
 import { validateI18nConfig } from "../i18n/index.js";
 import { BuilderError } from "./errors.js";
+import { serializePublicUrl } from "./url.js";
 const pluginSchema = z.custom((value) => {
     if (!value || typeof value !== "object")
         return false;
@@ -147,7 +148,7 @@ function normalizeSiteUrl(value) {
     url.pathname = url.pathname.replace(/\/*$/, "/");
     url.search = "";
     url.hash = "";
-    return url.href;
+    return serializePublicUrl(url);
 }
 function assertRelativeProjectPath(label, value) {
     if (path.isAbsolute(value)

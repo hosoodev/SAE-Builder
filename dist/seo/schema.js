@@ -10,7 +10,7 @@ function absoluteUrl(value, label) {
     if ((url.protocol !== "https:" && url.protocol !== "http:") || url.username || url.password) {
         throw new TypeError(`${label} must be an absolute HTTP(S) URL without credentials.`);
     }
-    return url.href;
+    return serializePublicUrl(url);
 }
 function optionalText(value, label) {
     return value === undefined ? undefined : requireText(value, label);
@@ -176,4 +176,5 @@ export function serializeJsonLd(value) {
 export function renderJsonLd(value) {
     return `<script type="application/ld+json">${serializeJsonLd(value)}</script>`;
 }
+import { serializePublicUrl } from "../core/url.js";
 //# sourceMappingURL=schema.js.map

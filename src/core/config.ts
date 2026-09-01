@@ -10,6 +10,7 @@ import {
 } from "../content/collection.js";
 import { validateI18nConfig } from "../i18n/index.js";
 import { BuilderError } from "./errors.js";
+import { serializePublicUrl } from "./url.js";
 import type {
   BuilderConfig,
   ResolvedBuilderConfig,
@@ -168,7 +169,7 @@ function normalizeSiteUrl(value: string): string {
   url.pathname = url.pathname.replace(/\/*$/, "/");
   url.search = "";
   url.hash = "";
-  return url.href;
+  return serializePublicUrl(url);
 }
 
 function assertRelativeProjectPath(label: string, value: string): void {

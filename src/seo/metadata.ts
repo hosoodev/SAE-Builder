@@ -1,4 +1,5 @@
 import { escapeXml } from "./xml.js";
+import { serializePublicUrl } from "../core/url.js";
 
 export type OpenGraphType = "website" | "article";
 
@@ -92,7 +93,7 @@ export function normalizeSiteBase(siteUrl: string | URL): URL {
 export function resolveSiteUrl(siteUrl: string | URL, route: string): string {
   const base = normalizeSiteBase(siteUrl);
   const normalizedRoute = normalizeSeoRoute(route);
-  return new URL(normalizedRoute.slice(1), base).href;
+  return serializePublicUrl(new URL(normalizedRoute.slice(1), base));
 }
 
 /** Resolve an explicit or generated canonical URL. Relative canonicals stay under the site base. */
@@ -114,7 +115,7 @@ export function resolveCanonical(input: CanonicalInput): string {
   if (canonical.hash) {
     throw new TypeError("Canonical URL must not contain a fragment.");
   }
-  return canonical.href;
+  return serializePublicUrl(canonical);
 }
 
 /** Whether a URL is hosted outside the configured origin or base path. */
@@ -150,7 +151,7 @@ function resolveMediaUrl(siteUrl: string | URL, route: string, value: string): s
   }
   const url = new URL(trimmed, resolveSiteUrl(siteUrl, route));
   assertHttpUrl(url, "Open Graph image");
-  return url.href;
+  return serializePublicUrl(url);
 }
 
 export function buildMetadata(input: MetadataInput): ResolvedMetadata {

@@ -1,4 +1,5 @@
 import { escapeXml } from "./xml.js";
+import { serializePublicUrl } from "../core/url.js";
 function assertHttpUrl(url, label) {
     if ((url.protocol !== "https:" && url.protocol !== "http:") || url.username || url.password) {
         throw new TypeError(`${label} must be an HTTP(S) URL without credentials.`);
@@ -51,7 +52,7 @@ export function normalizeSiteBase(siteUrl) {
 export function resolveSiteUrl(siteUrl, route) {
     const base = normalizeSiteBase(siteUrl);
     const normalizedRoute = normalizeSeoRoute(route);
-    return new URL(normalizedRoute.slice(1), base).href;
+    return serializePublicUrl(new URL(normalizedRoute.slice(1), base));
 }
 /** Resolve an explicit or generated canonical URL. Relative canonicals stay under the site base. */
 export function resolveCanonical(input) {
@@ -72,7 +73,7 @@ export function resolveCanonical(input) {
     if (canonical.hash) {
         throw new TypeError("Canonical URL must not contain a fragment.");
     }
-    return canonical.href;
+    return serializePublicUrl(canonical);
 }
 /** Whether a URL is hosted outside the configured origin or base path. */
 export function canonicalBelongsToSite(canonical, siteUrl) {
@@ -102,7 +103,7 @@ function resolveMediaUrl(siteUrl, route, value) {
     }
     const url = new URL(trimmed, resolveSiteUrl(siteUrl, route));
     assertHttpUrl(url, "Open Graph image");
-    return url.href;
+    return serializePublicUrl(url);
 }
 export function buildMetadata(input) {
     const title = requireText(input.title, "Metadata title");

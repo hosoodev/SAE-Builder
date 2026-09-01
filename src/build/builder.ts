@@ -26,6 +26,7 @@ import {
   type Logger,
   type ResolvedBuilderConfig,
   type UserConfig,
+  serializePublicUrl,
 } from "../core/index.js";
 import {
   createContentRepository,
@@ -248,7 +249,7 @@ function manifestUnderSiteBase(manifest: AssetManifest, siteUrl: string): AssetM
 function resolveSiteAssetUrl(siteUrl: string, value: string): string {
   return value.startsWith("/")
     ? resolveSiteUrl(siteUrl, value)
-    : new URL(value, siteUrl).href;
+    : serializePublicUrl(new URL(value, siteUrl));
 }
 
 function stagePathFor(config: ResolvedBuilderConfig): string {
@@ -494,7 +495,7 @@ function schemasForPage(
     nodes.push(createOrganizationSchema({
       name: config.site.organization.name,
       url: config.site.organization.url ?? config.site.url,
-      id: new URL("#organization", config.site.url).href,
+      id: serializePublicUrl(new URL("#organization", config.site.url)),
       logo: config.site.organization.logo
         ? resolveSiteAssetUrl(config.site.url, config.site.organization.logo)
         : undefined,
@@ -517,7 +518,7 @@ function schemasForPage(
         ? {
             name: config.site.organization.name,
             url: config.site.organization.url ?? config.site.url,
-            id: new URL("#organization", config.site.url).href,
+            id: serializePublicUrl(new URL("#organization", config.site.url)),
           }
         : undefined,
     }));
@@ -537,7 +538,7 @@ function schemasForPage(
       name: item.name,
       url: item.url.startsWith("/")
         ? resolveSiteUrl(config.site.url, item.url)
-        : new URL(item.url, config.site.url).href,
+        : serializePublicUrl(new URL(item.url, config.site.url)),
     }));
     if (breadcrumbItems.at(-1)?.url !== metadata.canonical) {
       breadcrumbItems.push({ name: fm.title, url: metadata.canonical });

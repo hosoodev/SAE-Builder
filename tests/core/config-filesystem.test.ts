@@ -33,6 +33,13 @@ test("config defaults resolve every path under the consumer root", () => {
   }
 });
 
+test("config preserves a readable internationalized site hostname", () => {
+  const config = resolveConfig({
+    site: { name: "Korean IDN", url: "https://영문주소변환.kr" },
+  }, process.cwd());
+  assert.equal(config.site.url, "https://영문주소변환.kr/");
+});
+
 test("config accepts safe integration keys and rejects executable input", () => {
   const config = resolveConfig({
     ...minimal,

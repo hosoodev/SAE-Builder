@@ -71,7 +71,7 @@ function absoluteUrl(value: string, label: string): string {
   if ((url.protocol !== "https:" && url.protocol !== "http:") || url.username || url.password) {
     throw new TypeError(`${label} must be an absolute HTTP(S) URL without credentials.`);
   }
-  return url.href;
+  return serializePublicUrl(url);
 }
 
 function optionalText(value: string | undefined, label: string): string | undefined {
@@ -251,3 +251,4 @@ export function serializeJsonLd(value: JsonLdValue): string {
 export function renderJsonLd(value: JsonLdValue): string {
   return `<script type="application/ld+json">${serializeJsonLd(value)}</script>`;
 }
+import { serializePublicUrl } from "../core/url.js";
