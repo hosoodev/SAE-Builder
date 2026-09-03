@@ -22,6 +22,7 @@ export interface RenderOgSvgOptions {
   readonly fontFamily?: string;
   readonly titleCharactersPerLine?: number;
   readonly subtitleCharactersPerLine?: number;
+  readonly subtitleLineCount?: number;
   readonly fonts?: readonly EmbeddedOgFont[];
   readonly assets?: Readonly<Record<string, string>>;
   readonly template: string;
@@ -116,12 +117,15 @@ export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): 
     dimension(options.titleCharactersPerLine ?? 24, "OG title characters per line"),
     2,
   );
+  const subtitleLineCount = dimension(options.subtitleLineCount ?? 3, "OG subtitle line count");
+  if (subtitleLineCount > 5) {
+    throw new RangeError("OG subtitle line count must be an integer between 1 and 5.");
+  }
   const subtitleLines = wrap(
     data.subtitle ?? "",
     dimension(options.subtitleCharactersPerLine ?? 42, "OG subtitle characters per line"),
-    3,
+    subtitleLineCount,
   );
-  const compactSubtitleLines = wrap(data.subtitle ?? "", 21, 4);
   const values: Record<string, string> = {
     width: String(width),
     height: String(height),
@@ -133,10 +137,8 @@ export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): 
     subtitleLine1: subtitleLines[0] ?? "",
     subtitleLine2: subtitleLines[1] ?? "",
     subtitleLine3: subtitleLines[2] ?? "",
-    compactSubtitleLine1: compactSubtitleLines[0] ?? "",
-    compactSubtitleLine2: compactSubtitleLines[1] ?? "",
-    compactSubtitleLine3: compactSubtitleLines[2] ?? "",
-    compactSubtitleLine4: compactSubtitleLines[3] ?? "",
+    subtitleLine4: subtitleLines[3] ?? "",
+    subtitleLine5: subtitleLines[4] ?? "",
     category: data.category ?? "",
     siteName: data.siteName ?? "",
   };

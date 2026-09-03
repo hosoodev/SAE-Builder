@@ -90,6 +90,7 @@ export interface OgConfig {
   fontFamily?: string;
   titleCharactersPerLine: number;
   subtitleCharactersPerLine: number;
+  subtitleLineCount: number;
   fonts: Array<{
     file: string;
     weight: number;

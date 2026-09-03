@@ -167,8 +167,9 @@ SVG 템플릿은 원문 `title`, `subtitle` 외에도 `titleLine1`,
 `titleCharactersPerLine`과 `subtitleCharactersPerLine`으로 사이트 템플릿의
 안전 영역 폭에 맞는 줄당 최대 글자 수를 지정할 수 있으며, 마지막 줄을 넘어가는
 문구는 영역 안에서 말줄임표로 끝납니다.
-중앙 정사각형처럼 폭이 좁은 안전 영역에는 줄당 최대 21자로 나누는
-`compactSubtitleLine1`부터 `compactSubtitleLine4`를 사용할 수 있습니다.
+`subtitleLine4`, `subtitleLine5`도 사용할 수 있으며 `og.subtitleLineCount`로
+설명 줄 수를 최대 5줄까지 지정할 수 있습니다. `og.titleCharactersPerLine`과
+`og.subtitleCharactersPerLine`은 사이트의 안전 영역에 맞는 줄 길이를 정합니다.
 줄 단위 placeholder를 `tspan`에 배치하면 긴 문구가 이미지 밖으로 넘치지 않습니다.
 `og.assets`는 사이트의 `public` 디렉터리에 이미 존재하는 SVG·PNG·JPEG·WebP를
 가리킵니다. Builder가 파일을 data URI로 포함하므로 템플릿의

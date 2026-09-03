@@ -101,6 +101,7 @@ const configSchema = z.object({
         fontFamily: z.string().trim().min(1).optional(),
         titleCharactersPerLine: z.number().int().min(1).max(200).default(24),
         subtitleCharactersPerLine: z.number().int().min(1).max(200).default(42),
+        subtitleLineCount: z.number().int().min(1).max(5).default(3),
         fonts: z.array(z.object({
             file: z.string().trim().min(1),
             weight: z.number().int().min(1).max(1000).default(400),
@@ -116,6 +117,7 @@ const configSchema = z.object({
         quality: 90,
         titleCharactersPerLine: 24,
         subtitleCharactersPerLine: 42,
+        subtitleLineCount: 3,
         fonts: [],
         assets: {},
         templates: {},

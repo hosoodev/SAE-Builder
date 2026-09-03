@@ -946,6 +946,7 @@ async function planPageOgArtifacts(
       fontFamily: config.og.fontFamily,
       titleCharactersPerLine: config.og.titleCharactersPerLine,
       subtitleCharactersPerLine: config.og.subtitleCharactersPerLine,
+      subtitleLineCount: config.og.subtitleLineCount,
       fonts: await loadOgFonts(),
       assets: await loadOgAssets(),
       template,

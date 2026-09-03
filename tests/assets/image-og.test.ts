@@ -127,7 +127,7 @@ test("OG SVG data is XML escaped and raster hashes are deterministic", async (t)
 });
 
 test("OG SVG uses the configured family and provides wrapped text placeholders", () => {
-  const template = `<svg xmlns="http://www.w3.org/2000/svg"><text font-family="{{fontFamily}}">{{titleLine1}}</text><text>{{titleLine2}}</text><text>{{subtitleLine1}}</text><text>{{subtitleLine2}}</text><text>{{compactSubtitleLine1}}</text><text>{{compactSubtitleLine2}}</text><text>{{compactSubtitleLine3}}</text><text>{{compactSubtitleLine4}}</text></svg>`;
+  const template = `<svg xmlns="http://www.w3.org/2000/svg"><text font-family="{{fontFamily}}">{{titleLine1}}</text><text>{{titleLine2}}</text><text>{{subtitleLine1}}</text><text>{{subtitleLine2}}</text><text>{{subtitleLine3}}</text><text>{{subtitleLine4}}</text><text>{{subtitleLine5}}</text></svg>`;
   const svg = renderOgSvg({
     title: "한글 제목이 길어져도 두 줄 영역 안에서 읽을 수 있어야 하는 제목",
     subtitle: "A subtitle that is deliberately long enough to use more than one line in the social image.",
@@ -158,15 +158,18 @@ test("OG SVG supports site-specific line lengths and truncates the final line", 
   assert.match(svg, />1234567890\|1234567890\|123456789…</u);
 });
 
-test("OG SVG provides four compact subtitle lines for square-safe templates", () => {
-  const template = `<svg xmlns="http://www.w3.org/2000/svg"><text>{{compactSubtitleLine1}}</text><text>{{compactSubtitleLine2}}</text><text>{{compactSubtitleLine3}}</text><text>{{compactSubtitleLine4}}</text></svg>`;
+test("OG SVG supports up to five subtitle lines for narrow safe areas", () => {
+  const template = `<svg xmlns="http://www.w3.org/2000/svg"><text>{{subtitleLine1}}|{{subtitleLine2}}|{{subtitleLine3}}|{{subtitleLine4}}|{{subtitleLine5}}</text></svg>`;
   const svg = renderOgSvg({
     title: "Title",
-    subtitle: "1234567890123456789011234567890123456789012345678901234567890123456789012345678901234",
-  }, { template });
+    subtitle: "123456789012345678901234567890123456789012345678901234567890",
+  }, {
+    template,
+    subtitleCharactersPerLine: 12,
+    subtitleLineCount: 5,
+  });
 
-  assert.match(svg, />123456789012345678901</u);
-  assert.doesNotMatch(svg, /1234567890123456789011/u);
+  assert.match(svg, />123456789012\|345678901234\|567890123456\|789012345678\|901234567890</u);
   assert.doesNotMatch(svg, /\{\{/u);
 });
 

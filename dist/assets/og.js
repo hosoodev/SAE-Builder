@@ -41,8 +41,11 @@ export function renderOgSvg(data, options) {
         return Array.from({ length: count }, (_, index) => lines[index] ?? "");
     };
     const titleLines = wrap(data.title, dimension(options.titleCharactersPerLine ?? 24, "OG title characters per line"), 2);
-    const subtitleLines = wrap(data.subtitle ?? "", dimension(options.subtitleCharactersPerLine ?? 42, "OG subtitle characters per line"), 3);
-    const compactSubtitleLines = wrap(data.subtitle ?? "", 21, 4);
+    const subtitleLineCount = dimension(options.subtitleLineCount ?? 3, "OG subtitle line count");
+    if (subtitleLineCount > 5) {
+        throw new RangeError("OG subtitle line count must be an integer between 1 and 5.");
+    }
+    const subtitleLines = wrap(data.subtitle ?? "", dimension(options.subtitleCharactersPerLine ?? 42, "OG subtitle characters per line"), subtitleLineCount);
     const values = {
         width: String(width),
         height: String(height),
@@ -54,10 +57,8 @@ export function renderOgSvg(data, options) {
         subtitleLine1: subtitleLines[0] ?? "",
         subtitleLine2: subtitleLines[1] ?? "",
         subtitleLine3: subtitleLines[2] ?? "",
-        compactSubtitleLine1: compactSubtitleLines[0] ?? "",
-        compactSubtitleLine2: compactSubtitleLines[1] ?? "",
-        compactSubtitleLine3: compactSubtitleLines[2] ?? "",
-        compactSubtitleLine4: compactSubtitleLines[3] ?? "",
+        subtitleLine4: subtitleLines[3] ?? "",
+        subtitleLine5: subtitleLines[4] ?? "",
         category: data.category ?? "",
         siteName: data.siteName ?? "",
     };

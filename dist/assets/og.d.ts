@@ -10,6 +10,7 @@ export interface RenderOgSvgOptions {
     readonly fontFamily?: string;
     readonly titleCharactersPerLine?: number;
     readonly subtitleCharactersPerLine?: number;
+    readonly subtitleLineCount?: number;
     readonly fonts?: readonly EmbeddedOgFont[];
     readonly assets?: Readonly<Record<string, string>>;
     readonly template: string;
