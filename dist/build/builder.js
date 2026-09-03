@@ -635,8 +635,8 @@ async function planPageOgArtifacts(config, entries, useCache) {
             continue;
         const template = await loadOgTemplate(templateEntry);
         const planned = await planOgImage({
-            title: entry.frontmatter.title,
-            subtitle: entry.frontmatter.description,
+            title: entry.frontmatter.ogTitle ?? entry.frontmatter.title,
+            subtitle: entry.frontmatter.ogDescription ?? entry.frontmatter.description,
             category: entry.collection,
             siteName: config.site.name,
         }, {

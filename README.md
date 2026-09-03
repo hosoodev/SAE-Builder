@@ -8,7 +8,7 @@ HTML-first SEO/AEO 정적 사이트 빌더이며 `@hosoodev/sae-builder` 패키�
 현재 공개 GitHub 릴리스에서 설치할 수 있습니다.
 
 ```bash
-pnpm add -D github:hosoodev/SAE-Builder#v0.3.6
+pnpm add -D github:hosoodev/SAE-Builder#v0.3.10
 ```
 
 설치 후 사이트의 `package.json`에서 다음 명령을 연결합니다.
@@ -171,6 +171,9 @@ SVG 템플릿은 원문 `title`, `subtitle` 외에도 `titleLine1`,
 설명 줄 수를 최대 5줄까지 지정할 수 있습니다. `og.titleCharactersPerLine`과
 `og.subtitleCharactersPerLine`은 사이트의 안전 영역에 맞는 줄 길이를 정합니다.
 줄 단위 placeholder를 `tspan`에 배치하면 긴 문구가 이미지 밖으로 넘치지 않습니다.
+페이지 front matter의 `ogTitle`과 `ogDescription`은 생성 이미지의 문구만
+덮어씁니다. HTML의 title과 meta description은 기존 `title`과 `description`을
+계속 사용하므로 검색 제목과 썸네일 문구를 별도로 관리할 수 있습니다.
 `og.assets`는 사이트의 `public` 디렉터리에 이미 존재하는 SVG·PNG·JPEG·WebP를
 가리킵니다. Builder가 파일을 data URI로 포함하므로 템플릿의
 `<image href="{{logo}}">`처럼 기존 로고를 그대로 재사용할 수 있습니다.

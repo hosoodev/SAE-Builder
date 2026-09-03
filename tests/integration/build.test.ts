@@ -49,6 +49,7 @@ interface FixtureOptions {
   descriptionLength?: { min?: number; max?: number };
   ogEnabled?: boolean;
   ogTemplate?: boolean;
+  ogOverrides?: boolean;
   plugins?: string;
   integrations?: string;
 }
@@ -109,6 +110,7 @@ description: "A complete description for the deterministic fixture home page."
 slug: "/"
 locale: "en"
 updated: "2026-08-27"
+${options.ogOverrides ? 'ogTitle: "Concise social title"\nogDescription: "Concise social description"' : ""}
 scripts:
   - tool
 ---
@@ -291,6 +293,25 @@ test("automatic OG generation skips pages when no site template is configured", 
     assert.doesNotMatch(home, /property="og:image"/u);
   } finally {
     await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("automatic OG images prefer front matter social text overrides", async () => {
+  const defaultRoot = await fixture({ ogEnabled: true });
+  const overrideRoot = await fixture({ ogEnabled: true, ogOverrides: true });
+  try {
+    const defaultResult = await build({ root: defaultRoot, mode: "production" });
+    const overrideResult = await build({ root: overrideRoot, mode: "production" });
+    assert.notEqual(defaultResult.assets["og:/"], overrideResult.assets["og:/"]);
+
+    const overrideHome = await readFile(path.join(overrideRoot, "dist/index.html"), "utf8");
+    assert.match(overrideHome, /<title>Fixture site home page<\/title>/u);
+    assert.match(overrideHome, /A complete description for the deterministic fixture home page\./u);
+    assert.doesNotMatch(overrideHome, /Concise social title/u);
+    assert.doesNotMatch(overrideHome, /Concise social description/u);
+  } finally {
+    await rm(defaultRoot, { recursive: true, force: true });
+    await rm(overrideRoot, { recursive: true, force: true });
   }
 });
 

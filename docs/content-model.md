@@ -19,6 +19,8 @@ interface CoreFrontMatter {
   canonical?: string;
   image?: string;
   ogTemplate?: string;
+  ogTitle?: string;
+  ogDescription?: string;
   schemaType?: "WebPage" | "Article" | "WebApplication";
   breadcrumbs?: Array<{ name: string; url: string }>;
   collection?: string;
@@ -78,6 +80,8 @@ name. A consumer may map `og.templates.default` to an SVG below its own
 template exists, Builder skips automatic OG generation for that page.
 `ogTemplate` selects another consumer-owned template mapping. Builder never
 downloads fonts or external SVG resources. An explicit `image` always wins.
+`ogTitle` and `ogDescription` override only the text rendered into the generated
+social image; HTML metadata continues to use `title` and `description`.
 Consumer-owned images such as an existing logo can be mapped from the public
 directory through `og.assets`; Builder embeds them as data URIs for named
 template placeholders instead of duplicating brand artwork.

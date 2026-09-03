@@ -13,6 +13,8 @@ export declare const coreFrontMatterSchema: z.ZodObject<{
     canonical: z.ZodOptional<z.ZodString>;
     image: z.ZodOptional<z.ZodString>;
     ogTemplate: z.ZodOptional<z.ZodString>;
+    ogTitle: z.ZodOptional<z.ZodString>;
+    ogDescription: z.ZodOptional<z.ZodString>;
     schemaType: z.ZodOptional<z.ZodEnum<{
         WebPage: "WebPage";
         Article: "Article";

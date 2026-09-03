@@ -20,12 +20,16 @@ title: Example
 description: A useful description
 slug: /guide/example
 updated: "2026-08-27"
+ogTitle: Social title
+ogDescription: A concise social image description
 customField: retained
 ---
 # Example
 `);
 
   assert.equal(parsed.frontmatter.customField, "retained");
+  assert.equal(parsed.frontmatter.ogTitle, "Social title");
+  assert.equal(parsed.frontmatter.ogDescription, "A concise social image description");
   assert.match(parsed.body, /# Example/);
 });
 

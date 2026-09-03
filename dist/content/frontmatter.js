@@ -31,6 +31,8 @@ export const coreFrontMatterSchema = z.object({
     canonical: nonEmptyString.optional(),
     image: nonEmptyString.optional(),
     ogTemplate: nonEmptyString.optional(),
+    ogTitle: nonEmptyString.optional(),
+    ogDescription: nonEmptyString.optional(),
     schemaType: z.enum(["WebPage", "Article", "WebApplication"]).optional(),
     collection: nonEmptyString.optional(),
     tags: z.array(nonEmptyString).optional(),
