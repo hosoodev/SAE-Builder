@@ -99,6 +99,8 @@ const configSchema = z.object({
         format: z.enum(["png", "webp"]).default("png"),
         quality: z.number().int().min(1).max(100).default(90),
         fontFamily: z.string().trim().min(1).optional(),
+        titleCharactersPerLine: z.number().int().min(1).max(200).default(24),
+        subtitleCharactersPerLine: z.number().int().min(1).max(200).default(42),
         fonts: z.array(z.object({
             file: z.string().trim().min(1),
             weight: z.number().int().min(1).max(1000).default(400),
@@ -112,6 +114,8 @@ const configSchema = z.object({
         height: 630,
         format: "png",
         quality: 90,
+        titleCharactersPerLine: 24,
+        subtitleCharactersPerLine: 42,
         fonts: [],
         assets: {},
         templates: {},

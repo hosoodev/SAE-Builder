@@ -77,6 +77,8 @@ export interface OgConfig {
     format: "png" | "webp";
     quality: number;
     fontFamily?: string;
+    titleCharactersPerLine: number;
+    subtitleCharactersPerLine: number;
     fonts: Array<{
         file: string;
         weight: number;

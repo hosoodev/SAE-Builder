@@ -151,6 +151,8 @@ OG 디자인은 Builder에 내장하지 않습니다. 자동 생성을 사용하
 og: {
   enabled: true,
   fontFamily: "NanumGothic",
+  titleCharactersPerLine: 16,
+  subtitleCharactersPerLine: 21,
   fonts: [
     { file: "og/fonts/NanumGothic-Regular.ttf", weight: 400 },
     { file: "og/fonts/NanumGothic-Bold.ttf", weight: 700 }
@@ -162,6 +164,11 @@ og: {
 
 SVG 템플릿은 원문 `title`, `subtitle` 외에도 `titleLine1`,
 `titleLine2`, `subtitleLine1`부터 `subtitleLine3`까지 사용할 수 있습니다.
+`titleCharactersPerLine`과 `subtitleCharactersPerLine`으로 사이트 템플릿의
+안전 영역 폭에 맞는 줄당 최대 글자 수를 지정할 수 있으며, 마지막 줄을 넘어가는
+문구는 영역 안에서 말줄임표로 끝납니다.
+중앙 정사각형처럼 폭이 좁은 안전 영역에는 줄당 최대 21자로 나누는
+`compactSubtitleLine1`부터 `compactSubtitleLine4`를 사용할 수 있습니다.
 줄 단위 placeholder를 `tspan`에 배치하면 긴 문구가 이미지 밖으로 넘치지 않습니다.
 `og.assets`는 사이트의 `public` 디렉터리에 이미 존재하는 SVG·PNG·JPEG·WebP를
 가리킵니다. Builder가 파일을 data URI로 포함하므로 템플릿의

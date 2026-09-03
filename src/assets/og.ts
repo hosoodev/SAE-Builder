@@ -20,6 +20,8 @@ export interface RenderOgSvgOptions {
   readonly width?: number;
   readonly height?: number;
   readonly fontFamily?: string;
+  readonly titleCharactersPerLine?: number;
+  readonly subtitleCharactersPerLine?: number;
   readonly fonts?: readonly EmbeddedOgFont[];
   readonly assets?: Readonly<Record<string, string>>;
   readonly template: string;
@@ -91,8 +93,12 @@ export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): 
     const lines: string[] = [];
     while (remaining && lines.length < count) {
       const characters = [...remaining];
-      if (characters.length <= maximum || lines.length === count - 1) {
+      if (characters.length <= maximum) {
         lines.push(remaining);
+        break;
+      }
+      if (lines.length === count - 1) {
+        lines.push(`${characters.slice(0, Math.max(1, maximum - 1)).join("").trimEnd()}…`);
         break;
       }
       const candidate = characters.slice(0, maximum + 1).join("");
@@ -105,8 +111,17 @@ export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): 
     }
     return Array.from({ length: count }, (_, index) => lines[index] ?? "");
   };
-  const titleLines = wrap(data.title, 24, 2);
-  const subtitleLines = wrap(data.subtitle ?? "", 42, 3);
+  const titleLines = wrap(
+    data.title,
+    dimension(options.titleCharactersPerLine ?? 24, "OG title characters per line"),
+    2,
+  );
+  const subtitleLines = wrap(
+    data.subtitle ?? "",
+    dimension(options.subtitleCharactersPerLine ?? 42, "OG subtitle characters per line"),
+    3,
+  );
+  const compactSubtitleLines = wrap(data.subtitle ?? "", 21, 4);
   const values: Record<string, string> = {
     width: String(width),
     height: String(height),
@@ -118,6 +133,10 @@ export function renderOgSvg(data: OgTemplateData, options: RenderOgSvgOptions): 
     subtitleLine1: subtitleLines[0] ?? "",
     subtitleLine2: subtitleLines[1] ?? "",
     subtitleLine3: subtitleLines[2] ?? "",
+    compactSubtitleLine1: compactSubtitleLines[0] ?? "",
+    compactSubtitleLine2: compactSubtitleLines[1] ?? "",
+    compactSubtitleLine3: compactSubtitleLines[2] ?? "",
+    compactSubtitleLine4: compactSubtitleLines[3] ?? "",
     category: data.category ?? "",
     siteName: data.siteName ?? "",
   };
